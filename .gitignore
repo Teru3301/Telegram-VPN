@@ -1,0 +1,6 @@
+Bot/build/*
+.cache
+token
+*token
+*env
+
