@@ -14,6 +14,7 @@ include_directories(
 
 
 add_executable(bot
+    ./src/loger.cpp
     ./src/main.cpp
 )
 

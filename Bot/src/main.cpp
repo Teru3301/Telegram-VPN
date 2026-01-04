@@ -1,22 +1,21 @@
-#include <fstream>
+
 #include <string>
-#include <stdio.h>
-#include <tgbot/tgbot.h>
+#include <fstream>
+#include "loger.hpp"
 
 
-std::string loadOrRequestToken(const std::string& filepath) {
+//  Загрузка или сохранение телеграм бот токена
+std::string loadOrRequestToken(const std::string& filepath) 
+{
     std::string token;
     
-    // Пробуем загрузить из файла
     std::ifstream in(filepath);
     if (in && std::getline(in, token) && !token.empty())
         return token;
     
-    // Запрашиваем у пользователя
     std::cout << "Enter bot token: ";
     std::getline(std::cin, token);
     
-    // Сохраняем в файл
     std::ofstream out(filepath);
     if (out) out << token;
     
@@ -24,30 +23,43 @@ std::string loadOrRequestToken(const std::string& filepath) {
 }
 
 
-int main() {
+int main()
+{
     std::string path = "token";
     std::string TOKEN = loadOrRequestToken(path);
-    TgBot::Bot bot(TOKEN);
-    bot.getEvents().onCommand("start", [&bot](TgBot::Message::Ptr message) {
-        bot.getApi().sendMessage(message->chat->id, "Hi!");
+    TgBot::Bot bot{TOKEN};
+
+
+    bot.getEvents().onCommand("start", [&bot](TgBot::Message::Ptr message) 
+    {
+        bot.getApi().sendMessage(message->chat->id, "This is VPN telegram bot");
     });
-    bot.getEvents().onAnyMessage([&bot](TgBot::Message::Ptr message) {
-        printf("User wrote %s\n", message->text.c_str());
-        if (StringTools::startsWith(message->text, "/start")) {
+   
+    bot.getEvents().onAnyMessage([&bot](TgBot::Message::Ptr message) 
+    {
+        Log(message);
+        if (StringTools::startsWith(message->text, "/start")) 
+        {
             return;
         }
         bot.getApi().sendMessage(message->chat->id, "Your message is: " + message->text);
     });
-    try {
-        printf("Bot username: %s\n", bot.getApi().getMe()->username.c_str());
-        TgBot::TgLongPoll longPoll(bot);
-        while (true) {
-            printf("Long poll started\n");
+
+
+    try 
+    {
+        Log("Bot username: " + bot.getApi().getMe()->username);
+        TgBot::TgLongPoll longPoll{bot};
+        while (true)
+        {
             longPoll.start();
         }
-    } catch (TgBot::TgException& e) {
-        printf("error: %s\n", e.what());
+    } 
+    catch (TgBot::TgException& e) 
+    {
+        Log("Error:" + std::string(e.what()));
     }
+    
     return 0;
 }
 
