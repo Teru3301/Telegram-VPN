@@ -1,7 +1,9 @@
 
 #include <string>
 #include <fstream>
-#include "loger.hpp"
+
+#include "bot/dispatcher.hpp" 
+#include "bot/commands.hpp"
 
 
 //  Загрузка или сохранение телеграм бот токена
@@ -30,19 +32,14 @@ int main()
     TgBot::Bot bot{TOKEN};
 
 
-    bot.getEvents().onCommand("start", [&bot](TgBot::Message::Ptr message) 
+    CommandDispatcher dispatcher;
+    dispatcher.setFallback(createAnyCommand());
+    dispatcher.add(createStartCommand());
+    dispatcher.add(createProfileCommand());
+    dispatcher.add(createHelpCommand());
+    bot.getEvents().onAnyMessage([&](TgBot::Message::Ptr msg)
     {
-        bot.getApi().sendMessage(message->chat->id, "This is VPN telegram bot");
-    });
-   
-    bot.getEvents().onAnyMessage([&bot](TgBot::Message::Ptr message) 
-    {
-        Log(message);
-        if (StringTools::startsWith(message->text, "/start")) 
-        {
-            return;
-        }
-        bot.getApi().sendMessage(message->chat->id, "Your message is: " + message->text);
+        dispatcher.dispatch(bot, msg);
     });
 
 
