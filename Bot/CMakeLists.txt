@@ -29,6 +29,8 @@ add_executable(bot
     ./src/bot/commands/profile.cpp
     ./src/bot/commands/any.cpp
     ./src/bot/commands/help.cpp
+    ./src/mongo/mongo.cpp 
+    ./src/mongo/config.cpp
 )
 
 
