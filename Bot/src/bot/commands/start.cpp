@@ -1,6 +1,5 @@
 
 #include "bot/commands.hpp"
-#include <tgbot/tgbot.h>
 
 
 class StartCommand : public Command {
@@ -13,6 +12,8 @@ public:
         Log("[" + std::to_string(msg->from->id) + "] StartCommand");
         Log(msg);
         bot.getApi().sendMessage(msg->chat->id, "This is VPN telegram bot");
+        bool reg_ok = ReristerUser(msg->from->id, msg->from->username);
+        Log(reg_ok ? "A new user has registered" : "The user was not registered");
     }
 };
 

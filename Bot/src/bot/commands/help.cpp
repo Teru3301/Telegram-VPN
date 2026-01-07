@@ -1,6 +1,5 @@
 
 #include "bot/commands.hpp"
-#include <tgbot/tgbot.h>
 
 
 class HelpCommand : public Command {
@@ -16,7 +15,8 @@ public:
                 "Тут должна быть справка по командам бота\n"
                 "/start - начать пользоваться ботом\n"
                 "/profile - посмотреть свой профиль\n"
-                "/help - показать справку"
+                "/help - показать справку\n"
+                "/howtouse - инструкция для включения VPN"
                 );
     }
 };

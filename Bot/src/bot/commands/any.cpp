@@ -1,6 +1,5 @@
 
 #include "bot/commands.hpp"
-#include <tgbot/tgbot.h>
 
 
 class AnyCommand : public Command {

@@ -24,6 +24,7 @@ int main()
     dispatcher.add(createStartCommand());
     dispatcher.add(createProfileCommand());
     dispatcher.add(createHelpCommand());
+    dispatcher.add(createHowToUseCommand());
     bot.getEvents().onAnyMessage([&](TgBot::Message::Ptr msg)
     {
         dispatcher.dispatch(bot, msg);

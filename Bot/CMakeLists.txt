@@ -31,6 +31,8 @@ add_executable(bot
     ./src/bot/commands/help.cpp
     ./src/mongo/mongo.cpp 
     ./src/mongo/config.cpp
+    ./src/mongo/users.cpp 
+    ./src/bot/commands/howtouse.cpp
 )
 
 
