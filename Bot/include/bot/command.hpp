@@ -13,3 +13,10 @@ public:
 };
 
 
+class Callback {
+public:
+    virtual ~Callback() = default;
+    virtual std::string name() const = 0;
+    virtual void execute(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query) = 0;
+};
+

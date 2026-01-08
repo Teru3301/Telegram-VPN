@@ -19,15 +19,23 @@ int main()
     TgBot::Bot bot{TOKEN};
 
 
-    CommandDispatcher dispatcher;
-    dispatcher.setFallback(createAnyCommand());
-    dispatcher.add(createStartCommand());
-    dispatcher.add(createProfileCommand());
-    dispatcher.add(createHelpCommand());
-    dispatcher.add(createHowToUseCommand());
+    CommandDispatcher cmd_dispatcher;
+    cmd_dispatcher.setFallback(createAnyCommand());
+    cmd_dispatcher.add(createStartCommand());
+    cmd_dispatcher.add(createProfileCommand());
+    cmd_dispatcher.add(createHelpCommand());
+    cmd_dispatcher.add(createHowToUseCommand());
     bot.getEvents().onAnyMessage([&](TgBot::Message::Ptr msg)
     {
-        dispatcher.dispatch(bot, msg);
+        cmd_dispatcher.dispatch(bot, msg);
+    });
+
+
+    CallbackDispatcher cal_dispatcher;
+    cal_dispatcher.add(createProfileCallback());
+    bot.getEvents().onCallbackQuery([&](TgBot::CallbackQuery::Ptr query)
+    {
+        cal_dispatcher.dispatch(bot, query);
     });
 
 
@@ -47,5 +55,4 @@ int main()
     
     return 0;
 }
-
 

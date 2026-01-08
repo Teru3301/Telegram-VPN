@@ -8,6 +8,12 @@ void CommandDispatcher::add(std::unique_ptr<Command> cmd)
 }
 
 
+void CallbackDispatcher::add(std::unique_ptr<Callback> cmd)
+{
+    commands_[cmd->name()] = std::move(cmd);
+}
+
+
 void CommandDispatcher::setFallback(std::unique_ptr<Command> cmd)
 {
     fallback_ = std::move(cmd);
@@ -28,4 +34,12 @@ void CommandDispatcher::dispatch(TgBot::Bot& bot, TgBot::Message::Ptr msg)
     }
 }
 
+
+void CallbackDispatcher::dispatch(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query)
+{
+    auto it = commands_.find(query->data);
+    if (it != commands_.end()) {
+        it->second->execute(bot, query);
+    }
+}
 

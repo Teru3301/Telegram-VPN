@@ -16,3 +16,13 @@ private:
     std::unique_ptr<Command> fallback_;
 };
 
+
+class CallbackDispatcher {
+public:
+    void add(std::unique_ptr<Callback> cmd);
+    void dispatch(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query);
+
+private:
+    std::unordered_map<std::string, std::unique_ptr<Callback>> commands_;
+};
+
