@@ -4,6 +4,59 @@
 #include <iomanip>
 
 
+MessageView Profile(int64_t user_id)
+{
+    std::ostringstream balance_stream;
+    balance_stream << std::fixed << std::setprecision(2)
+                   << CheckBalance(user_id);
+
+    bool subscription_active = false;
+    std::string subscription_end_date = "—"; // TODO
+    double download_gb = 0.0; // TODO
+    double upload_gb   = 0.0; // TODO
+
+    std::ostringstream text;
+    text
+        << "👤 Профиль\n"
+        << "──────────────\n"
+        << "💰 Баланс: " << balance_stream.str() << " ₽\n"
+        << "📦 Подписка: "
+        << (subscription_active ? "Активна\n" : "Не активна\n");
+
+    if (subscription_active) {
+        text << "⏳ Окончание: " << subscription_end_date << "\n";
+    }
+
+    text
+        << "⬇️ Скачано: " << std::fixed << std::setprecision(2) << download_gb << " GB\n"
+        << "⬆️ Загружено: " << std::fixed << std::setprecision(2) << upload_gb << " GB\n";
+
+    TgBot::InlineKeyboardMarkup::Ptr keyboard(new TgBot::InlineKeyboardMarkup);
+
+    std::vector<TgBot::InlineKeyboardButton::Ptr> row;
+
+    {
+        TgBot::InlineKeyboardButton::Ptr btn(new TgBot::InlineKeyboardButton);
+        btn->text = "Временная заглушка";
+        btn->callbackData = "plug1";
+        row.push_back(btn);
+    }
+    {
+        TgBot::InlineKeyboardButton::Ptr btn(new TgBot::InlineKeyboardButton);
+        btn->text = "Временная заглушка";
+        btn->callbackData = "plug2";
+        row.push_back(btn);
+    }
+
+    keyboard->inlineKeyboard.push_back(row);
+
+    return {
+        text.str(),
+        keyboard
+    };
+}
+
+
 class ProfileCommand : public Command {
 public:
     std::string name() const override {
@@ -12,34 +65,15 @@ public:
 
     void execute(TgBot::Bot& bot, TgBot::Message::Ptr msg) override {
         Log("[" + std::to_string(msg->from->id) + "] Profile command");
-        Log(msg);
 
-        std::ostringstream balance_stream;
-        balance_stream << std::fixed << std::setprecision(2)
-                       << CheckBalance(msg->from->id);
+        auto view = Profile(msg->from->id);
 
-        bool subscription_active = false;
-        std::string subscription_end_date = "—"; // TODO
-        double download_gb = 0.0; // TODO
-        double upload_gb   = 0.0; // TODO
-
-        std::ostringstream text;
-        text
-            << "👤 Профиль\n"
-            << "──────────────\n"
-            << "💰 Баланс: " << balance_stream.str() << " ₽\n"
-            << "📦 Подписка: "
-            << (subscription_active ? "Активна\n" : "Не активна\n");
-
-        if (subscription_active) {
-            text << "⏳ Окончание: " << subscription_end_date << "\n";
-        }
-
-        text
-            << "⬇️ Скачано: " << std::fixed << std::setprecision(2) << download_gb << " GB\n"
-            << "⬆️ Загружено: " << std::fixed << std::setprecision(2) << upload_gb << " GB\n";
-
-        bot.getApi().sendMessage(msg->chat->id, text.str());
+        bot.getApi().sendMessage(
+            msg->chat->id,
+            view.text,
+            nullptr, nullptr,
+            view.keyboard
+        );
     }
 };
 
@@ -47,7 +81,7 @@ public:
 class ProfileCallback : public Callback {
 public:
     std::string name() const override {
-        return "profile"; // callback_data
+        return "profile";
     }
 
     void execute(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query) override {
@@ -56,39 +90,19 @@ public:
 
         Log("[" + std::to_string(query->from->id) + "] Profile callback");
 
-        std::ostringstream balance_stream;
-        balance_stream << std::fixed << std::setprecision(2)
-                       << CheckBalance(query->from->id);
+        auto view = Profile(query->from->id);
 
-        bool subscription_active = false;
-        std::string subscription_end_date = "—"; // TODO
-        double download_gb = 0.0; // TODO
-        double upload_gb   = 0.0; // TODO
-
-        std::ostringstream text;
-        text
-            << "👤 Профиль\n"
-            << "──────────────\n"
-            << "💰 Баланс: " << balance_stream.str() << " ₽\n"
-            << "📦 Подписка: "
-            << (subscription_active ? "Активна\n" : "Не активна\n");
-
-        if (subscription_active) {
-            text << "⏳ Окончание: " << subscription_end_date << "\n";
-        }
-
-        text
-            << "⬇️ Скачано: " << std::fixed << std::setprecision(2) << download_gb << " GB\n"
-            << "⬆️ Загружено: " << std::fixed << std::setprecision(2) << upload_gb << " GB\n";
-
-        // Обязательно отвечаем на callback, чтобы убрать "часики"
         bot.getApi().answerCallbackQuery(query->id);
 
-        // Можно редактировать сообщение
         bot.getApi().editMessageText(
-            text.str(),
+            view.text,
             query->message->chat->id,
-            query->message->messageId
+            query->message->messageId,
+            "",
+            "",
+            nullptr,
+            view.keyboard,
+            {}
         );
     }
 };

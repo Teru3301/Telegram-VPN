@@ -20,3 +20,9 @@ public:
     virtual void execute(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query) = 0;
 };
 
+
+struct MessageView {
+    std::string text;
+    TgBot::InlineKeyboardMarkup::Ptr keyboard;
+};
+
