@@ -7,10 +7,19 @@
 
 
 std::unique_ptr<Command> createStartCommand();
-std::unique_ptr<Command> createProfileCommand();
-std::unique_ptr<Command> createAnyCommand();
-std::unique_ptr<Command> createHelpCommand();
-std::unique_ptr<Command> createHowToUseCommand();
+std::unique_ptr<Callback> createStartCallback();
 
+std::unique_ptr<Command> createProfileCommand();
 std::unique_ptr<Callback> createProfileCallback();
+
+std::unique_ptr<Command> createAnyCommand();
+
+std::unique_ptr<Command> createHelpCommand();
+std::unique_ptr<Callback> createHelpCallback();
+
+std::unique_ptr<Command> createHowToUseCommand();
+std::unique_ptr<Callback> createHowToUseCallback();
+
+std::unique_ptr<Command> createBuyCommand();
+std::unique_ptr<Callback> createBuyCallback();
 

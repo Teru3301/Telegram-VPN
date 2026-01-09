@@ -7,10 +7,10 @@
 std::string date_time_prifix();
 
 
-class Loger 
+class Logger 
 {
 public:
-    Loger(std::string message)
+    Logger(std::string message)
     {
         this->message = message;
         this->user_id = -1;
@@ -18,7 +18,7 @@ public:
         this->date_time = date_time_prifix();
         log();
     }
-    Loger(TgBot::Message::Ptr message)
+    Logger(TgBot::Message::Ptr message)
     {
         this->message = message->text;
         this->user_id = message->from->id;

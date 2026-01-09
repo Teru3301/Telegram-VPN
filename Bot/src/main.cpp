@@ -20,23 +20,22 @@ int main()
 
 
     CommandDispatcher cmd_dispatcher;
+    CallbackDispatcher cal_dispatcher;
+
     cmd_dispatcher.setFallback(createAnyCommand());
     cmd_dispatcher.add(createStartCommand());
+    cal_dispatcher.add(createStartCallback());
     cmd_dispatcher.add(createProfileCommand());
-    cmd_dispatcher.add(createHelpCommand());
-    cmd_dispatcher.add(createHowToUseCommand());
-    bot.getEvents().onAnyMessage([&](TgBot::Message::Ptr msg)
-    {
-        cmd_dispatcher.dispatch(bot, msg);
-    });
-
-
-    CallbackDispatcher cal_dispatcher;
     cal_dispatcher.add(createProfileCallback());
-    bot.getEvents().onCallbackQuery([&](TgBot::CallbackQuery::Ptr query)
-    {
-        cal_dispatcher.dispatch(bot, query);
-    });
+    cmd_dispatcher.add(createHelpCommand());
+    cal_dispatcher.add(createHelpCallback());
+    cmd_dispatcher.add(createHowToUseCommand());
+    cal_dispatcher.add(createHowToUseCallback());
+    cmd_dispatcher.add(createBuyCommand());
+    cal_dispatcher.add(createBuyCallback());
+    
+    bot.getEvents().onAnyMessage([&](TgBot::Message::Ptr msg) {cmd_dispatcher.dispatch(bot, msg);});
+    bot.getEvents().onCallbackQuery([&](TgBot::CallbackQuery::Ptr query) {cal_dispatcher.dispatch(bot, query);});
 
 
     try 

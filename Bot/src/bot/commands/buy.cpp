@@ -1,0 +1,85 @@
+
+#include "bot/commands.hpp"
+#include <sstream>
+#include <iomanip>
+
+
+MessageView Buy(int64_t user_id)
+{
+    std::ostringstream text;
+    text << "Приобрести подписку на VPN";
+
+    TgBot::InlineKeyboardMarkup::Ptr keyboard(new TgBot::InlineKeyboardMarkup);
+
+    keyboard->inlineKeyboard.push_back({MakeButton("1 месяц", "plug")});
+    keyboard->inlineKeyboard.push_back({MakeButton("3 месяца", "plug")});
+    keyboard->inlineKeyboard.push_back({MakeButton("6 месяцев", "plug")});
+    keyboard->inlineKeyboard.push_back({MakeButton("🎁 Ввести промокод", "plug")});
+    keyboard->inlineKeyboard.push_back({MakeButton("🔙 Назад", "start")});
+
+    return {
+        text.str(),
+        keyboard
+    };
+}
+
+
+class BuyCommand : public Command {
+public:
+    std::string name() const override {
+        return "/buy_vpn";
+    }
+
+    void execute(TgBot::Bot& bot, TgBot::Message::Ptr msg) override {
+        Log("[" + std::to_string(msg->from->id) + "] Buy command");
+
+        auto view = Buy(msg->from->id);
+
+        bot.getApi().sendMessage(
+            msg->chat->id,
+            view.text,
+            nullptr, nullptr,
+            view.keyboard
+        );
+    }
+};
+
+
+class BuyCallback : public Callback {
+public:
+    std::string name() const override {
+        return "buy_vpn";
+    }
+
+    void execute(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query) override {
+        if (!query || !query->from || !query->message)
+            return;
+
+        Log("[" + std::to_string(query->from->id) + "] Buy callback");
+
+        auto view = Buy(query->from->id);
+
+        bot.getApi().answerCallbackQuery(query->id);
+
+        bot.getApi().editMessageText(
+            view.text,
+            query->message->chat->id,
+            query->message->messageId,
+            "",
+            "",
+            nullptr,
+            view.keyboard,
+            {}
+        );
+    }
+};
+
+ 
+std::unique_ptr<Command> createBuyCommand() {
+    return std::make_unique<BuyCommand>();
+}
+
+std::unique_ptr<Callback> createBuyCallback() {
+    return std::make_unique<BuyCallback>();
+}
+

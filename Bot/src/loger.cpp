@@ -17,7 +17,7 @@ std::string date_time_prifix()
 }
 
 
-void Loger::log ()
+void Logger::log ()
 {
     std::string log_message = this->date_time + " ";
     if (this->user_id != -1) log_message += ( "[" + std::to_string(this->user_id) );
@@ -30,13 +30,13 @@ void Loger::log ()
 }
 
 
-void Loger::log_to_cmd(const std::string& log_message)
+void Logger::log_to_cmd(const std::string& log_message)
 {
     std::clog << log_message << std::endl;
 }
 
 
-void Loger::log_to_file(const std::string& log_message)
+void Logger::log_to_file(const std::string& log_message)
 {
     std::ofstream file(this->log_file_path, std::ios::app);   
     if (file.is_open()) 
@@ -58,11 +58,11 @@ void Loger::log_to_file(const std::string& log_message)
 
 void Log(std::string message)
 {
-    Loger l = Loger(message);
+    Logger l = Logger(message);
 }
 void Log(TgBot::Message::Ptr message)
 {
-    Loger l = Loger(message);
+    Logger l = Logger(message);
 }
 
 
