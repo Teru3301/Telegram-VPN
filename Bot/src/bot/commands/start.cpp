@@ -5,8 +5,18 @@
 
 MessageView Start(int64_t user_id)
 {
+    SetState(user_id, UserState::Idle);
+    
     std::ostringstream text;
-    text << "Добро пожаловать в VPN бот 👋\nВыберите действие:";
+    text 
+        << "🚀 Добро пожаловать в VPN Бот!\n\n"
+        << "Здесь ты можешь получить быстрый и надежный VPN доступ всего в пару кликов!\n\n"
+        << "🔸 Моментальное подключение\n"
+        << "🔸 Защищенное соединение\n"
+        << "🔸 Установка за 2 минуты\n"
+        << "🔸 Поддерживаемые платформы\n"
+        << " - 📱 Android\n - 🖥️ Windows\n - 🐧 Linux\n\n"
+        << "👇 Выбери нужный раздел ниже:";
 
     TgBot::InlineKeyboardMarkup::Ptr keyboard = std::make_shared<TgBot::InlineKeyboardMarkup>();
     std::vector<TgBot::InlineKeyboardButton::Ptr> row;    
@@ -44,7 +54,7 @@ public:
             view.keyboard
         );
 
-        bool reg_ok = ReristerUser(msg->from->id, msg->from->username);
+        bool reg_ok = RegisterUser(msg->from->id, msg->from->username);
         Log(reg_ok ? "A new user has registered" : "The user was not registered");
     }
 };
@@ -89,7 +99,7 @@ public:
         }
 
 
-        bool reg_ok = ReristerUser(query->from->id, query->from->username);
+        bool reg_ok = RegisterUser(query->from->id, query->from->username);
         Log(reg_ok ? "A new user has registered" : "The user was not registered");
     }
 };

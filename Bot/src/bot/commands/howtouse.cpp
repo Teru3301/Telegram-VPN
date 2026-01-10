@@ -4,6 +4,8 @@
 
 MessageView HowToUse (int64_t user_id)
 {
+    SetState(user_id, UserState::Idle);
+    
     std::ostringstream text;
     text
         << "Тут будут инструкции для запуска VPN\n"
@@ -11,9 +13,9 @@ MessageView HowToUse (int64_t user_id)
 
     TgBot::InlineKeyboardMarkup::Ptr keyboard(new TgBot::InlineKeyboardMarkup);
 
-    keyboard->inlineKeyboard.push_back({MakeButton("Windows", "how_to_windows")});
-    keyboard->inlineKeyboard.push_back({MakeButton("Linux", "how_to_linux")});
-    keyboard->inlineKeyboard.push_back({MakeButton("Android", "how_to_android")});
+    keyboard->inlineKeyboard.push_back({MakeButton("🖥️ Windows", "how_to_windows")});
+    keyboard->inlineKeyboard.push_back({MakeButton("🐧 Linux", "how_to_linux")});
+    keyboard->inlineKeyboard.push_back({MakeButton("📱Android", "how_to_android")});
     keyboard->inlineKeyboard.push_back({MakeButton("🔙 Назад", "start")});
 
     return {

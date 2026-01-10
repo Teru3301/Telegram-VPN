@@ -4,7 +4,7 @@
 #include <tgbot/tgbot.h>
 
 
-std::string date_time_prifix();
+std::string prefix();
 
 
 class Logger 
@@ -15,7 +15,7 @@ public:
         this->message = message;
         this->user_id = -1;
         this->user_name = "";
-        this->date_time = date_time_prifix();
+        this->date_time = prefix();
         log();
     }
     Logger(TgBot::Message::Ptr message)
@@ -24,7 +24,7 @@ public:
         this->user_id = message->from->id;
         if (!message->from->username.empty()) this->user_name = message->from->username;
         else this->user_name = "";
-        this->date_time = date_time_prifix();
+        this->date_time = prefix();
         log();
     }
 private:

@@ -6,6 +6,8 @@
 
 MessageView Profile(int64_t user_id)
 {
+    SetState(user_id, UserState::Idle);
+    
     std::ostringstream balance_stream;
     balance_stream << std::fixed << std::setprecision(2)
                    << CheckBalance(user_id);
@@ -20,10 +22,10 @@ MessageView Profile(int64_t user_id)
     };
 
     std::vector<Key> keys;
-    Key k1 {"123123123", 12.6, 0.7, "2031.01.01", true};
-    Key k2 {"78yb83bd3", 4.2, 0.2, "2026.05.08", false};
-    keys.push_back(k1);
-    keys.push_back(k2);
+    //Key k1 {"123123123", 12.6, 0.7, "2031.01.01", true};
+    //Key k2 {"78yb83bd3", 4.2, 0.2, "2026.05.08", false};
+    //keys.push_back(k1);
+    //keys.push_back(k2);
 
 
     std::ostringstream text;
@@ -42,12 +44,8 @@ MessageView Profile(int64_t user_id)
 
     TgBot::InlineKeyboardMarkup::Ptr keyboard(new TgBot::InlineKeyboardMarkup);
 
-    std::vector<TgBot::InlineKeyboardButton::Ptr> row;
-    
-    row.push_back(MakeButton("🔐 Получить ключи VPN", "buy_vpn"));
-    row.push_back(MakeButton("🔙 Назад", "start"));
-
-    keyboard->inlineKeyboard.push_back(row);
+    keyboard->inlineKeyboard.push_back({MakeButton("🔐 Получить ключи VPN", "buy_vpn")});
+    keyboard->inlineKeyboard.push_back({MakeButton("🔙 Назад", "start")});
 
     return {
         text.str(),

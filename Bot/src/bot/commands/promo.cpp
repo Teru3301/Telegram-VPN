@@ -2,23 +2,17 @@
 #include "bot/commands.hpp"
 
 
-MessageView Help (int64_t user_id)
+MessageView Promo (int64_t user_id)
 {
-    SetState(user_id, UserState::Idle);
+    SetState(user_id, UserState::WaitPromo);
     
     std::ostringstream text;
     text
-        << "Тут должна быть справка по командам бота\n"
-        << "/start - начать пользоваться ботом\n"
-        << "/profile - посмотреть свой профиль\n"
-        << "/help - показать справку\n"
-        << "/howtouse - инструкция для включения VPN\n"
-        << "/buy_vpn - получить ключ VPN\n"
-        << "/promo - ввести промокод";
+        << "🎁 Введите промокод:";
 
     TgBot::InlineKeyboardMarkup::Ptr keyboard(new TgBot::InlineKeyboardMarkup);
 
-    keyboard->inlineKeyboard.push_back({MakeButton("🔙 Назад", "start")});
+    keyboard->inlineKeyboard.push_back({MakeButton("🔙 Отмена", "buy_vpn")});
 
     return {
         text.str(),
@@ -26,17 +20,18 @@ MessageView Help (int64_t user_id)
     };
 }
 
-class HelpCommand : public Command {
+
+class PromoCommand : public Command {
 public:
     std::string name() const override {
-        return "/help";
+        return "/promo";
     }
 
     void execute(TgBot::Bot& bot, TgBot::Message::Ptr msg) override {
-        Log("[" + std::to_string(msg->from->id) + "] Help command");
+        Log("[" + std::to_string(msg->from->id) + "] Promo command");
         Log(msg);
         
-        auto view = Help(msg->from->id);
+        auto view = Promo(msg->from->id);
         
         bot.getApi().sendMessage(
             msg->chat->id,
@@ -49,23 +44,23 @@ public:
 };
 
 
-class HelpCallback : public Callback {
+class PromoCallback : public Callback {
 public:
     std::string name() const override {
-        return "help";
+        return "promo";
     }
 
     void execute(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query) override {
         if (!query || !query->from || !query->message)
             return;
 
-        Log("[" + std::to_string(query->from->id) + "] Help callback");
+        Log("[" + std::to_string(query->from->id) + "] Promo callback");
 
         try 
         {
             bot.getApi().answerCallbackQuery(query->id);
 
-            auto view = Help(query->from->id);
+            auto view = Promo(query->from->id);
 
             bot.getApi().editMessageText(
                 view.text,
@@ -83,18 +78,18 @@ public:
             Log("Кнопка устарела");
             bot.getApi().sendMessage (
                 query->message->chat->id,
-                "Кнопка устарела. Используйте /help"
+                "Кнопка устарела. Используйте /promo"
             );
         }
     }
 };
 
 
-std::unique_ptr<Command> createHelpCommand() {
-    return std::make_unique<HelpCommand>();
+std::unique_ptr<Command> createPromoCommand() {
+    return std::make_unique<PromoCommand>();
 }
 
-std::unique_ptr<Callback> createHelpCallback() {
-    return std::make_unique<HelpCallback>();
+std::unique_ptr<Callback> createPromoCallback() {
+    return std::make_unique<PromoCallback>();
 }
 

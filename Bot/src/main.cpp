@@ -18,7 +18,6 @@ int main()
     }
     TgBot::Bot bot{TOKEN};
 
-
     CommandDispatcher cmd_dispatcher;
     CallbackDispatcher cal_dispatcher;
 
@@ -33,10 +32,11 @@ int main()
     cal_dispatcher.add(createHowToUseCallback());
     cmd_dispatcher.add(createBuyCommand());
     cal_dispatcher.add(createBuyCallback());
+    cmd_dispatcher.add(createPromoCommand());
+    cal_dispatcher.add(createPromoCallback());
     
     bot.getEvents().onAnyMessage([&](TgBot::Message::Ptr msg) {cmd_dispatcher.dispatch(bot, msg);});
     bot.getEvents().onCallbackQuery([&](TgBot::CallbackQuery::Ptr query) {cal_dispatcher.dispatch(bot, query);});
-
 
     try 
     {

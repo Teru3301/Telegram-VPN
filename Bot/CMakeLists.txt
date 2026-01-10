@@ -35,6 +35,8 @@ add_executable(bot
     ./src/bot/commands/howtouse.cpp
     ./src/bot/commands/buy.cpp
     ./src/bot/command.cpp
+    ./src/bot/UserState.cpp
+    ./src/bot/commands/promo.cpp
 )
 
 

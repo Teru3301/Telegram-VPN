@@ -6,7 +6,7 @@
 #include "loger.hpp"
 
 
-std::string date_time_prifix()
+std::string prefix()
 {
     auto now = std::chrono::system_clock::now();
     auto time_t_now = std::chrono::system_clock::to_time_t(now);

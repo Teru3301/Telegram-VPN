@@ -23,3 +23,6 @@ std::unique_ptr<Callback> createHowToUseCallback();
 std::unique_ptr<Command> createBuyCommand();
 std::unique_ptr<Callback> createBuyCallback();
 
+std::unique_ptr<Command> createPromoCommand();
+std::unique_ptr<Callback> createPromoCallback();
+

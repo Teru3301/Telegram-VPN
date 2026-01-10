@@ -6,6 +6,8 @@
 
 MessageView Buy(int64_t user_id)
 {
+    SetState(user_id, UserState::Idle);
+    
     std::ostringstream text;
     text << "Приобрести подписку на VPN";
 
@@ -14,7 +16,7 @@ MessageView Buy(int64_t user_id)
     keyboard->inlineKeyboard.push_back({MakeButton("1 месяц", "plug")});
     keyboard->inlineKeyboard.push_back({MakeButton("3 месяца", "plug")});
     keyboard->inlineKeyboard.push_back({MakeButton("6 месяцев", "plug")});
-    keyboard->inlineKeyboard.push_back({MakeButton("🎁 Ввести промокод", "plug")});
+    keyboard->inlineKeyboard.push_back({MakeButton("🎁 Ввести промокод", "promo")});
     keyboard->inlineKeyboard.push_back({MakeButton("🔙 Назад", "start")});
 
     return {
