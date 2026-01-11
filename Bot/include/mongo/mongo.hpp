@@ -6,6 +6,8 @@
 #include <mongocxx/uri.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/builder/basic/kvp.hpp>
+#include <mongocxx/collection.hpp>
+#include <mongocxx/cursor.hpp>
 
 
 class Database {

@@ -12,16 +12,8 @@ MessageView Profile(int64_t user_id)
     balance_stream << std::fixed << std::setprecision(2)
                    << CheckBalance(user_id);
 
-    struct Key 
-    {
-        std::string key = "";
-        double d_gb = 0.0;
-        double u_gb = 0.0;
-        std::string end_date = "";
-        bool active = false;
-    };
-
-    std::vector<Key> keys;
+    std::vector<Key> keys = FindKeys(user_id);
+    
     //Key k1 {"123123123", 12.6, 0.7, "2031.01.01", true};
     //Key k2 {"78yb83bd3", 4.2, 0.2, "2026.05.08", false};
     //keys.push_back(k1);
