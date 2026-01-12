@@ -37,9 +37,23 @@ void CommandDispatcher::dispatch(TgBot::Bot& bot, TgBot::Message::Ptr msg)
 
 void CallbackDispatcher::dispatch(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query)
 {
-    auto it = commands_.find(query->data);
-    if (it != commands_.end()) {
-        it->second->execute(bot, query);
+    if (!query || query->data.empty())
+        return;
+
+    for (auto& [name, cmd] : commands_)
+    {
+        if (query->data == name)
+        {
+            cmd->execute(bot, query);
+            return;
+        }
+
+        if (query->data.rfind(name + ":", 0) == 0)
+        {
+            cmd->execute(bot, query);
+            return;
+        }
     }
 }
+
 

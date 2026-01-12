@@ -7,6 +7,8 @@
 enum class UserState {
     Idle,
     WaitPromo,
+    CreatePromoAviableUses,
+    CreatePromoEnterPromocode,
     Payment
 };
 

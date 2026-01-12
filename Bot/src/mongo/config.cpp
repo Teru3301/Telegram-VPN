@@ -38,3 +38,46 @@ void SetTgBotToken(const std::string& token)
     );
 }
 
+
+bool IsAdmin(int64_t user_id)
+{
+    auto db = Database::instance().getDB();
+    mongocxx::collection admins_col = db["admins"];
+
+    auto result = admins_col.find_one(
+        bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("user_id", user_id)
+        )
+    );
+
+    return result.has_value();
+}
+
+
+bool AddAdmin(const std::string& admin_usertag)
+{
+    if (admin_usertag.empty())
+        return false;
+
+    auto db = Database::instance().getDB();
+    mongocxx::collection admins_col = db["admins"];
+
+    auto existing = admins_col.find_one(
+        bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("usertag", admin_usertag)
+        )
+    );
+
+    if (existing)
+        return false; 
+
+    auto result = admins_col.insert_one(
+        bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("usertag", admin_usertag)
+        )
+    );
+
+    return static_cast<bool>(result);
+}
+
+

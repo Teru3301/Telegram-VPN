@@ -26,6 +26,7 @@ MessageView Help (int64_t user_id)
     };
 }
 
+
 class HelpCommand : public Command {
 public:
     std::string name() const override {

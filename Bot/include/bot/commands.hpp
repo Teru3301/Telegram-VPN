@@ -3,7 +3,7 @@
 #include "loger.hpp"
 #include <memory>
 #include "bot/command.hpp"
-#include "mongo/users.hpp"
+#include "mongo/user_calls.hpp"
 
 
 std::unique_ptr<Command> createStartCommand();
@@ -25,4 +25,10 @@ std::unique_ptr<Callback> createBuyCallback();
 
 std::unique_ptr<Command> createPromoCommand();
 std::unique_ptr<Callback> createPromoCallback();
+
+std::unique_ptr<Command> createCreatePromoCommand();
+std::unique_ptr<Callback> createCreatePromoCallback();
+std::unique_ptr<Callback> createCreatePromoBonusCallback();
+std::unique_ptr<Callback> createCreatePromoPromoCallback();
+std::unique_ptr<Callback> createConfirmCreatePromoCallback();
 

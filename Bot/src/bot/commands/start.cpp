@@ -1,6 +1,7 @@
 
 #include <tgbot/tgbot.h>
 #include "bot/commands.hpp"
+#include "mongo/config.hpp"
 
 
 MessageView Start(int64_t user_id)
@@ -28,6 +29,13 @@ MessageView Start(int64_t user_id)
 
     keyboard->inlineKeyboard.push_back(row);
 
+    if (IsAdmin(user_id))
+    {
+        text 
+        << "\n\nВы назначены администратором этого бота";
+        keyboard->inlineKeyboard.push_back(std::vector<TgBot::InlineKeyboardButton::Ptr>{MakeButton("🎁 Создать промокод", "create_promo")});
+    }
+
     return {
         text.str(),
         keyboard
@@ -44,7 +52,10 @@ public:
     void execute(TgBot::Bot& bot, TgBot::Message::Ptr msg) override {
         Log("[" + std::to_string(msg->from->id) + "] StartCommand");
         Log(msg);
-        
+
+        bool reg_ok = RegisterUser(msg->from->id, msg->from->username);
+        Log(reg_ok ? "A new user has registered" : "The user was not registered");
+
         auto view = Start(msg->from->id);
 
         bot.getApi().sendMessage(
@@ -53,9 +64,6 @@ public:
             nullptr, nullptr,
             view.keyboard
         );
-
-        bool reg_ok = RegisterUser(msg->from->id, msg->from->username);
-        Log(reg_ok ? "A new user has registered" : "The user was not registered");
     }
 };
 

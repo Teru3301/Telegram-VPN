@@ -21,23 +21,8 @@ include_directories(
 )
 
 
-add_executable(bot
-    ./src/loger.cpp
-    ./src/main.cpp
-    ./src/bot/dispatcher.cpp 
-    ./src/bot/commands/start.cpp
-    ./src/bot/commands/profile.cpp
-    ./src/bot/commands/any.cpp
-    ./src/bot/commands/help.cpp
-    ./src/mongo/mongo.cpp 
-    ./src/mongo/config.cpp
-    ./src/mongo/users.cpp 
-    ./src/bot/commands/howtouse.cpp
-    ./src/bot/commands/buy.cpp
-    ./src/bot/command.cpp
-    ./src/bot/UserState.cpp
-    ./src/bot/commands/promo.cpp
-)
+file(GLOB_RECURSE BOT_SRC "src/*.cpp")
+add_executable(bot ${BOT_SRC})
 
 
 link_directories(

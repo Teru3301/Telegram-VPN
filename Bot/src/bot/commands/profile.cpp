@@ -8,18 +8,8 @@ MessageView Profile(int64_t user_id)
 {
     SetState(user_id, UserState::Idle);
     
-    std::ostringstream balance_stream;
-    balance_stream << std::fixed << std::setprecision(2)
-                   << CheckBalance(user_id);
-
     std::vector<Key> keys = FindKeys(user_id);
     
-    //Key k1 {"123123123", 12.6, 0.7, "2031.01.01", true};
-    //Key k2 {"78yb83bd3", 4.2, 0.2, "2026.05.08", false};
-    //keys.push_back(k1);
-    //keys.push_back(k2);
-
-
     std::ostringstream text;
     text
         << "👤 Ваш профиль\n\n"
@@ -27,9 +17,12 @@ MessageView Profile(int64_t user_id)
 
     for (auto key : keys)
     {
+        std::time_t t = static_cast<std::time_t>(key.end_date);
+        std::tm tm{};
+        localtime_r(&t, &tm);
         text 
         << "<code>" << key.key << "</code>\n"
-        << "Дата окончания: " << key.end_date << "\n"
+        << "Дата окончания: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "\n"
         << "⬇️ Скачано: " << key.d_gb << "GB\n"
         << "⬆️ Отправлено: " << key.u_gb << "GB\n\n";
     }

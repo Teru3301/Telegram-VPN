@@ -1,6 +1,6 @@
 
 #include "bot/commands.hpp"
-#include "mongo/users.hpp"
+#include "mongo/user_calls.hpp"
 
 
 MessageView OnIdle(TgBot::Message::Ptr msg)
@@ -57,6 +57,84 @@ MessageView OnWaitPromo(TgBot::Message::Ptr msg)
     };
 }
 
+
+MessageView OnEnterAviableUses(TgBot::Message::Ptr msg)
+{
+    std::ostringstream text;
+    TgBot::InlineKeyboardMarkup::Ptr keyboard(new TgBot::InlineKeyboardMarkup);
+
+    uint64_t uses = 0;
+    const uint64_t MAX_USES = 1000000; // ограничение на количество использований
+
+    try
+    {
+        if (msg->text.empty())
+            throw std::invalid_argument("empty input");
+
+        size_t pos = 0;
+        uses = std::stoull(msg->text, &pos);
+
+        // проверка на лишние символы и допустимый диапазон
+        if (pos != msg->text.size() || uses == 0 || uses > MAX_USES)
+            throw std::invalid_argument("invalid range");
+
+        // сохраняем значение в черновик
+        SetPromoDraftUses(msg->from->id, uses);
+
+        text << "Введите промокод (например FREEVPN)";
+        SetState(msg->from->id, UserState::CreatePromoEnterPromocode);
+    }
+    catch (const std::exception& e)
+    {
+        text << "❌ Ошибка!\nВведите целое положительное число от 1 до " << MAX_USES;
+
+        keyboard->inlineKeyboard.push_back({
+            MakeButton("🔁 Ввести ещё раз", "bonus")
+        });
+
+        SetState(msg->from->id, UserState::Idle);
+    }
+
+    keyboard->inlineKeyboard.push_back({
+        MakeButton("🔙 Отмена", "start")
+    });
+
+    return {
+        text.str(),
+        keyboard
+    };
+}
+
+
+MessageView OnEnterPromocode(TgBot::Message::Ptr msg)
+{
+    std::ostringstream text;
+    TgBot::InlineKeyboardMarkup::Ptr keyboard(new TgBot::InlineKeyboardMarkup);
+    std::string promo = msg->text;
+    //  валидация ввода
+    if (!CheckPromo(promo))
+    {
+        SetPromoDraftPromo(msg->from->id, promo);
+        text << "Подтвердите создание промокода";
+        SetState(msg->from->id, UserState::Idle);
+        std::vector<TgBot::InlineKeyboardButton::Ptr> row;
+        keyboard->inlineKeyboard.push_back({MakeButton("Создать", "confirm_create_promo")});
+    }
+    else 
+    {
+        text << "Что-то не так! Возможно такой промокод уже существует. Попробуйте ввести ещё раз";
+        SetState(msg->from->id, UserState::CreatePromoEnterPromocode);
+    }
+
+    keyboard->inlineKeyboard.push_back({MakeButton("🔙 Отмена", "start")});
+
+    return {
+        text.str(),
+        keyboard
+    };
+}
+
+
 MessageView OnError(TgBot::Message::Ptr msg)
 {
     SetState(msg->from->id, UserState::Idle);
@@ -99,6 +177,16 @@ public:
                 Log("UserState = WaitPromo");
                 view = OnWaitPromo(msg);
                 break;
+           
+            case UserState::CreatePromoAviableUses:
+                Log("UserState = CreatePromo");
+                view =  OnEnterAviableUses(msg); 
+                break;
+
+            case UserState::CreatePromoEnterPromocode:
+                Log("UserState = CreatePromo");
+                view = OnEnterPromocode(msg);
+                break;
             
             default:
                 Log("Непредвиденный UserState");
@@ -117,5 +205,4 @@ public:
 std::unique_ptr<Command> createAnyCommand() {
     return std::make_unique<AnyCommand>();
 }
-
 

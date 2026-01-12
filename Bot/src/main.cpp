@@ -1,22 +1,15 @@
 
 #include <string>
 
-#include "bot/dispatcher.hpp" 
+#include "config.hpp"
+#include "bot/dispatcher.hpp"
 #include "bot/commands.hpp"
-#include "mongo/config.hpp"
 
 
 int main()
 {
-    std::string path = "token";
-    std::string TOKEN = GetTgBotToken();
-    if (TOKEN == "")
-    {
-        std::cout << "Enter bot token: ";
-        std::getline(std::cin, TOKEN);
-        SetTgBotToken(TOKEN);
-    }
-    TgBot::Bot bot{TOKEN};
+    AddTgAdmin();
+    TgBot::Bot bot{GetToken()};
 
     CommandDispatcher cmd_dispatcher;
     CallbackDispatcher cal_dispatcher;
@@ -34,6 +27,11 @@ int main()
     cal_dispatcher.add(createBuyCallback());
     cmd_dispatcher.add(createPromoCommand());
     cal_dispatcher.add(createPromoCallback());
+    cmd_dispatcher.add(createCreatePromoCommand());
+    cal_dispatcher.add(createCreatePromoCallback());
+    cal_dispatcher.add(createCreatePromoBonusCallback());
+    cal_dispatcher.add(createCreatePromoPromoCallback());
+    cal_dispatcher.add(createConfirmCreatePromoCallback());
     
     bot.getEvents().onAnyMessage([&](TgBot::Message::Ptr msg) {cmd_dispatcher.dispatch(bot, msg);});
     bot.getEvents().onCallbackQuery([&](TgBot::CallbackQuery::Ptr query) {cal_dispatcher.dispatch(bot, query);});
