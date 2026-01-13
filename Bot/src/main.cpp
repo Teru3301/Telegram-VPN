@@ -4,10 +4,12 @@
 #include "config.hpp"
 #include "bot/dispatcher.hpp"
 #include "bot/commands.hpp"
+#include "xui/services.hpp"
 
 
 int main()
 {
+    if(xui::Service::IsAlive()) return 1;
     AddTgAdmin();
     TgBot::Bot bot{GetToken()};
 

@@ -2,6 +2,8 @@
 
 Безопасный VPN-сервис с доступом через Telegram-бота.
 
+<img src="https://img.shields.io/badge/bash-4EAA25?style=for-the-badge&logo=gnubash&logoColor=ffffff"/> <img src="https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=cplusplus&logoColor=ffffff"/> <img src="https://img.shields.io/badge/cmake-064F8C?style=for-the-badge&logo=cmake&logoColor=ffffff"/> <img src="https://img.shields.io/badge/mongodb-47A248?style=for-the-badge&logo=mongodb&logoColor=ffffff"/> <img src="https://img.shields.io/badge/telegram-26A5E4?style=for-the-badge&logo=Telegram&logoColor=ffffff"/> <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=ffffff"/> <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=ffffff"/>
+
 ---
 
 ## Особенности
@@ -52,8 +54,10 @@ chmod +x SetUp.sh
 ## TODO
 
 - [ ] Реализация Telegram-бота
-- [ ] Веб-панель управления
-- [ ] Система промокодов
+- [x] Система промокодов
+- [ ] Интергация с 3x-ui
+- [ ] Интеграция с банковой системой
+- [ ] Создание docker образа
 
 ---
 
