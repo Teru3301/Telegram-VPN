@@ -40,7 +40,7 @@ ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$SERVER_IP 
     echo ''
     echo 'Update package lists...'
     apt update -y > /dev/null 2>&1
-    echo 'Upgrade packages...'
+    echo 'Upgrade packages... (it will take some time)'
     apt upgrade -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" > /dev/null 2>&1
     echo 'Cleaning...'
     apt autoremove -y > /dev/null 2>&1
@@ -151,9 +151,6 @@ if [ $? -eq 0 ]; then
     echo "   ssh -p $CUSTOM_PORT $NEW_USER_NAME@$SERVER_IP"
     echo '2. Or run this command on the server:'
     echo "   sudo newgrp docker"
-    echo ''
-    echo '------------------------------------------------'
-    echo ''
 else
     echo 'Connection error!'
     exit 1

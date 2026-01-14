@@ -50,7 +50,7 @@ bool IsAdmin(int64_t user_id)
         )
     );
 
-    return result.has_value();
+    return static_cast<bool>(result); // mongocxx 3.9
 }
 
 

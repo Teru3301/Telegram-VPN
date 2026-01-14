@@ -1,0 +1,6 @@
+.git
+build
+Bot/build
+*.o
+*.a
+
