@@ -1,0 +1,22 @@
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  bot:
+    build: .
+    depends_on:
+      - mongo
+    environment:
+      TG_BOT_TOKEN: ${TG_BOT_TOKEN}
+      MONGO_URI: ${MONGO_URI}
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
+

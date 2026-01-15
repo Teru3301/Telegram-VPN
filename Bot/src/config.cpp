@@ -2,16 +2,22 @@
 #include "config.hpp" 
 #include <iostream>
 #include <mongo/config.hpp>
+#include <cstdlib>
 
 
 std::string GetToken()
 {
+    const char* env_token = std::getenv("TG_BOT_TOKEN");
+    if (env_token && std::string(env_token).length() > 0)
+    {
+        return std::string(env_token);
+    }
+
     std::string token = GetTgBotToken();
     if (token == "")
     {
-        std::cout << "Enter bot token: ";
-        std::getline(std::cin, token);
-        SetTgBotToken(token);
+        std::cerr << "Error: TG_BOT_TOKEN environment variable is not set.\n";
+        std::exit(1); 
     }
     return token;
 }
@@ -19,7 +25,7 @@ std::string GetToken()
 
 void AddTgAdmin()
 {
-    while (true)
+    while (false)
     {
         std::cout << "Add a new Telegram administrator? (y/n): ";
         std::string answer;
