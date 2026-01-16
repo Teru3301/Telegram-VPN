@@ -1,6 +1,7 @@
 .git
 build
 Bot/build
+.env
 *.o
 *.a
 

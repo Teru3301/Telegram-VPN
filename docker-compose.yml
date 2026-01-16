@@ -10,6 +10,7 @@ services:
 
   bot:
     build: .
+    container_name: telegram-vpn-bot
     depends_on:
       - mongo
     environment:

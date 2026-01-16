@@ -1,65 +1,67 @@
-FROM alpine:3.19
-
-ENV CMAKE_GENERATOR=Ninja
-ENV LD_LIBRARY_PATH=/usr/local/lib
+FROM alpine:3.19 AS builder
 
 RUN apk add --no-cache \
     build-base \
     cmake \
     ninja \
     git \
-    curl \
-    wget \
-    pkgconf \
-    openssl-dev \
-    curl-dev \
     boost-dev \
     libconfig-dev \
     jsoncpp-dev \
     zlib-dev \
-    ca-certificates \
-    bash \
-    vim \
-    less
-
-WORKDIR /workspace
-
-RUN apk add --no-cache \
-    mongo-c-driver \
-    mongo-c-driver-dev
+    openssl-dev \
+    curl-dev \
+    pkgconf
 
 WORKDIR /tmp
-RUN git clone https://github.com/mongodb/mongo-cxx-driver \
-    && cd mongo-cxx-driver \
-    && git checkout r3.9.0 \
-    && mkdir -p build && cd build \
-    && cmake .. \
+
+RUN git clone --branch r4.0.0 --depth 1 https://github.com/mongodb/mongo-cxx-driver \
+    && cmake -S mongo-cxx-driver -B mongo-cxx-driver/build \
+        -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/usr/local \
         -DENABLE_TESTS=OFF \
-    && ninja \
-    && ninja install \
+        -DBUILD_SHARED_LIBS=ON \
+        -DBSONCXX_POLY_USE_MNMLSTC=1 \
+    && ninja -C mongo-cxx-driver/build \
+    && ninja -C mongo-cxx-driver/build install \
     && rm -rf /tmp/mongo-cxx-driver
 
-WORKDIR /tmp
-RUN git clone https://github.com/reo7sp/tgbot-cpp \
-    && cd tgbot-cpp \
-    && mkdir -p build && cd build \
-    && cmake .. \
+RUN git clone --depth 1 https://github.com/reo7sp/tgbot-cpp \
+    && cmake -S tgbot-cpp -B tgbot-cpp/build \
+        -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
         -DENABLE_TESTS=OFF \
-    && ninja \
-    && ninja install \
+    && ninja -C tgbot-cpp/build \
+    && ninja -C tgbot-cpp/build install \
     && rm -rf /tmp/tgbot-cpp
 
-WORKDIR /app
+WORKDIR /app/Bot
 COPY Bot/ /app/Bot/
 
-WORKDIR /app/Bot
-RUN mkdir build && cd build \
-    && cmake .. \
-    && ninja
+RUN cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
+    && ninja -C build \
+    && strip build/bot
+
+FROM alpine:3.19
+
+RUN apk add --no-cache \
+    boost \
+    libconfig \
+    jsoncpp \
+    zlib \
+    openssl \
+    curl \
+    ca-certificates
+
+COPY --from=builder /usr/local/lib /usr/local/lib
+COPY --from=builder /usr/local/include /usr/local/include
+
+ENV LD_LIBRARY_PATH=/usr/local/lib
 
 WORKDIR /app
-CMD ["/app/Bot/build/bot"]
+
+COPY --from=builder /app/Bot/build/bot /app/bot
+
+CMD ["/app/bot"]
 
