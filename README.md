@@ -64,7 +64,7 @@ chmod +x SetUp.sh
 
 `MONGO_URI` — строка подключения к MongoDB
 
-(в дальнейшем список будет расширяться)
+`XUI_URL` - адрес 3X-UI панели
 
 ---
 
@@ -76,10 +76,11 @@ chmod +x SetUp.sh
 - docker
 - docker-compose
 
-Убедитесь, что файл .env содержит необходимые переменные окружения:
+Убедитесь, что файл .env содержит переменные окружения с корректными значениями:
 ```
 TG_BOT_TOKEN=your_telegram_bot_token
 MONGO_URI=mongodb://mongo:27017
+XUI_URL=127.0.0.1:2053
 ```
 
 В корне репозитория выполните:
@@ -109,8 +110,11 @@ cmake --build .
 запуск бинарника
 
 ```bash
+# экспортируйте переменные окружения с вашими значениями
 export TG_BOT_TOKEN="12345:your_telegram_bot_token"
 export MONGO_URI="mongodb://mongo:27017"
+export XUI_URL=127.0.0.1:2053
+# запустите бота
 ./bot
 ```
 

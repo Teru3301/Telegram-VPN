@@ -1,40 +1,70 @@
 
-#include "xui/services.hpp" 
-#include <curl/curl.h>
+#include "xui/services.hpp"
 #include "loger.hpp"
-#include "xui/config.hpp" 
+#include "xui/models.hpp"
+#include "httplib.h"
 
 
 bool xui::Service::IsAlive()
 {
     auto cfg = GetConfig();
-    CURL* curl = curl_easy_init();
 
-    curl_easy_setopt(curl, CURLOPT_URL, cfg.base_url.c_str());
-    curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);        // HEAD запрос
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT, cfg.timeuot);
-    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    httplib::Client cli(cfg.base_url);
 
-    CURLcode res = curl_easy_perform(curl);
+    cli.set_connection_timeout(cfg.timeuot);
+    cli.set_read_timeout(cfg.timeuot);
+    cli.set_write_timeout(cfg.timeuot);
 
-    long http_code = 0;
-    if (res == CURLE_OK)
-        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+    auto res = cli.Head("/");
 
-    curl_easy_cleanup(curl);
-
-    if (res != CURLE_OK) {
-        Log(std::string("[3x-ui] unavailable: ") + curl_easy_strerror(res));
+    if (!res) {
+        Log("[3x-ui] unavailable: connection failed");
         return false;
     }
 
-    Log("[3x-ui] reachable, http code = " + std::to_string(http_code));
+    Log("[3x-ui] OK, reachable, http code = " + std::to_string(res->status));
     return true;
 }
 
 
 bool xui::Service::Login()
 {
-    return false;
+    auto cfg = GetConfig();
+    httplib::Client cli(cfg.base_url);
+
+    cli.set_connection_timeout(cfg.timeuot);
+    cli.set_read_timeout(cfg.timeuot);
+    cli.set_write_timeout(cfg.timeuot);
+
+    std::string body =
+        "username=" + cfg.login +
+        "&password=" + cfg.password;
+
+    auto res = cli.Post(
+        "/login",
+        body,
+        "application/x-www-form-urlencoded"
+    );
+
+    if (!res) {
+        Log("[3x-ui] login failed: no response");
+        return false;
+    }
+
+    if (res->status != 200) {
+        Log("[3x-ui] login failed: http code = " + std::to_string(res->status));
+        return false;
+    }
+
+    auto set_cookie = res->get_header_value("Set-Cookie");
+    if (set_cookie.empty()) {
+        Log("[3x-ui] login failed: no Set-Cookie");
+        return false;
+    }
+
+    SetCookie(set_cookie);
+
+    Log("[3x-ui] login OK");
+    return true;
 }
 
