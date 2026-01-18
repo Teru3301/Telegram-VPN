@@ -99,6 +99,7 @@ docker compose up -d
 - mongo-cxx-driver 4.0.0
 - libtgbot-cpp
 - MongoDB
+- 3X-UI
 
 ```bash
 mkdir -p Bot/buld
@@ -112,11 +113,17 @@ cmake --build .
 ```bash
 # экспортируйте переменные окружения с вашими значениями
 export TG_BOT_TOKEN="12345:your_telegram_bot_token"
-export MONGO_URI="mongodb://mongo:27017"
-export XUI_URL=127.0.0.1:2053
+export MONGO_URI="mongodb://127.0.0.1:27017"
+export XUI_URL="127.0.0.1:2053"
 # запустите бота
 ./bot
 ```
+
+---
+
+## Поддержка проекта
+
+**Если этот проект полезен для вас, вы можете поставить ему** :star:
 
 ---
 
@@ -124,7 +131,7 @@ export XUI_URL=127.0.0.1:2053
 
 ### Core
 - [ ] Реализация Telegram-бота
-- [ ] Интеграция с 3x-ui API
+- [x] Интеграция с 3x-ui API
 - [x] Создание docker образа
 
 ### Payments

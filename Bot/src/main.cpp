@@ -9,8 +9,7 @@
 
 int main()
 {
-    if (!xui::Service::IsAlive()) return 1;
-    if (!xui::Service::Login()) return 1;
+    if (!xui::Service::GetConnection()) return 1;
     AddTgAdmin();
     TgBot::Bot bot{GetToken()};
 
