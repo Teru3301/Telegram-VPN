@@ -49,6 +49,7 @@ bool Service::TryFindConnection()
             {
                 Log("[3x-ui] Found existing inbound: remark=bot, id=" +
                     std::to_string(inbound["id"].get<int>()));
+                SetInboundId(inbound["id"].get<int>());
                 return true;
             }
         }
@@ -59,6 +60,7 @@ bool Service::TryFindConnection()
     }
 
     Log("[3x-ui] No existing connection found");
+    SetInboundId(-1);
     return false;
 }
 
@@ -149,6 +151,10 @@ bool Service::GetConnection()
     if (!TryFindConnection())
     {
         CreateConnection(utils::GenerateRealityCert());
+    }
+    else
+    {
+        //
     }
     return TryFindConnection();
 }

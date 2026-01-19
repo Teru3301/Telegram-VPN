@@ -2,7 +2,7 @@
 #include "xui/utils.hpp"
 #include <random>
 #include <algorithm>
-#include <nlohmann/json.hpp>
+#include "nlohmann/json.hpp"
 #include <loger.hpp>
 
 
@@ -27,8 +27,7 @@ std::string utils::RandomHex(size_t len)
     return s;
 }
 
-
-std::string utils::RandomShortIds()
+std::vector<std::string> utils::RandomShortIds()
 {
     std::vector<int> lengths = {2, 4, 6, 8, 10, 12, 14, 16};
 
@@ -43,20 +42,8 @@ std::string utils::RandomShortIds()
         parts.push_back(xui::utils::RandomHex(len));
     }
 
-    std::ostringstream oss;
-
-    for (size_t i = 0; i < parts.size(); ++i)
-    {
-        if (i > 0)
-        {
-            oss << ",";
-        }
-        oss << parts[i];
-    }
-
-    return oss.str();
+    return parts;
 }
-
 
 RealityCert utils::GenerateRealityCert()
 {
@@ -84,7 +71,7 @@ RealityCert utils::GenerateRealityCert()
         RealityCert cert;
         cert.private_key= j["obj"]["privateKey"];
         cert.public_key = j["obj"]["publicKey"];
-        cert.short_ids.push_back(xui::utils::RandomShortIds());
+        cert.short_ids = xui::utils::RandomShortIds();
         return cert;
 
     } catch (const std::exception& e) {
@@ -101,6 +88,116 @@ httplib::Client utils::MakeClient(const Config& cfg) {
     cli.set_write_timeout(cfg.timeout);
     return cli;
 }
+
+
+std::string utils::GenerateUUID()
+{
+    static const char* hex = "0123456789abcdef";
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, 15);
+
+    std::string uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
+    for (char& c : uuid)
+    {
+        if (c == 'x') c = hex[dis(gen)];
+        if (c == 'y') c = hex[(dis(gen) & 0x3) | 0x8];
+    }
+    return uuid;
+}
+
+
+std::string utils::BuildVlessKey(const std::string& uuid, const std::string& host, int port,
+    const std::string& public_key, const std::string& short_id, const std::string& sni, const std::string& email)
+{
+    std::ostringstream ss;
+    ss << "vless://" << uuid << "@" << host << ":" << port << "?type=tcp" << "&security=reality" << "&pbk=" << public_key 
+        << "&fp=chrome" << "&sni=" << sni << "&sid=" << short_id << "&spx=%2F" << "#" << email;
+    return ss.str();
+}
+
+
+Client utils::GetClient(const std::string& email)
+{
+    Client result{};
+    result.enabled = false;
+
+    auto cfg = GetConfig();
+
+    httplib::Client cli = MakeClient(cfg);
+    httplib::Headers headers = {
+        {"Cookie", cfg.cookie},
+        {"Content-Type", "application/json"}
+    };
+
+    auto res = cli.Get("/panel/api/inbounds/list", headers);
+    if (!res || res->status != 200)
+    {
+        Log("[3x-ui] GetClient: bad HTTP response");
+        return result;
+    }
+
+    try
+    {
+        auto j = nlohmann::json::parse(res->body);
+
+        if (!j.contains("success") || !j["success"])
+            return result;
+
+        for (const auto& inbound : j["obj"])
+        {
+            if (inbound["id"].get<int>() != cfg.inbound_id)
+                continue;
+
+            int port = inbound["port"].get<int>();
+
+            // --- streamSettings ---
+            auto stream = nlohmann::json::parse(inbound["streamSettings"].get<std::string>());
+            auto reality = stream["realitySettings"];
+
+            std::string public_key = reality["publicKey"];
+            std::string sni = reality["serverNames"][0];
+            std::string short_id = reality["shortIds"][0];
+
+            // --- clients ---
+            auto settings = nlohmann::json::parse(inbound["settings"].get<std::string>());
+            for (const auto& client : settings["clients"])
+            {
+                if (client["email"] != email)
+                    continue;
+
+                result.email = email;
+                result.expiry_time = client["expiryTime"];
+                result.enabled = client["enable"];
+
+                std::string uuid = client["id"];
+
+                result.vless_uri = BuildVlessKey(
+                    uuid,
+                    "127.0.0.1",
+                    //cfg.uri,
+                    port,
+                    public_key,
+                    short_id,
+                    sni,
+                    email
+                );
+
+                return result;
+            }
+        }
+    }
+    catch (const std::exception& e)
+    {
+        Log(std::string("[3x-ui] GetClient parse error: ") + e.what());
+    }
+
+    return result;
+}
+
+
+
+
 
 }
 

@@ -1,5 +1,8 @@
 
 #include "mongo/user_calls.hpp"
+#include "xui/services.hpp"
+#include "loger.hpp"
+#include <chrono>
 
 
 bool CheckPromo(const std::string& promo)
@@ -52,36 +55,36 @@ bool UsePromo(int64_t user_id, const std::string& promo)
     int64_t now = static_cast<int64_t>(std::time(nullptr));
 
     if (aviable_uses <= 0)
+    {
+        Log("[mongo] No uses left");
         return false;
+    }
 
     if (now >= promo_end_date)
+    {
+        Log("[mongo] The promo code has expired");
         return false;
+    }
 
-    if (!promo_view["bonus"] || !promo_view["bonus_period"])
+    if (!promo_view["bonus_period"])
         return false;
-
-    std::string bonus_key =
-        std::string(promo_view["bonus"].get_string().value);
 
     int64_t bonus_period =
         promo_view["bonus_period"].get_int64().value;
-
-    auto existing_key = keys_col.find_one(
-        bsoncxx::builder::basic::make_document(
-            bsoncxx::builder::basic::kvp("user_id", user_id),
-            bsoncxx::builder::basic::kvp("key", bonus_key)
-        )
-    );
-
-    if (existing_key)
-        return false;
-
+    auto vless_client = xui::Service::CreateKey(bonus_period, user_id);
+   
     auto update_result = promo_col.find_one_and_update(
         bsoncxx::builder::basic::make_document(
             bsoncxx::builder::basic::kvp("promo", promo),
             bsoncxx::builder::basic::kvp("aviable_uses",
                 bsoncxx::builder::basic::make_document(
                     bsoncxx::builder::basic::kvp("$gt", 0)
+                )
+            ),
+            // пользователь ещё НЕ использовал промокод
+            bsoncxx::builder::basic::kvp("used_by",
+                bsoncxx::builder::basic::make_document(
+                    bsoncxx::builder::basic::kvp("$ne", user_id)
                 )
             )
         ),
@@ -90,19 +93,28 @@ bool UsePromo(int64_t user_id, const std::string& promo)
                 bsoncxx::builder::basic::make_document(
                     bsoncxx::builder::basic::kvp("aviable_uses", -1)
                 )
+            ),
+            bsoncxx::builder::basic::kvp("$push",
+                bsoncxx::builder::basic::make_document(
+                    bsoncxx::builder::basic::kvp("used_by", user_id)
+                )
             )
         )
     );
 
     if (!update_result)
+    {
+        Log("[mongo] Promo already used by this user or no uses left");
         return false;
+    }
 
     keys_col.insert_one(
         bsoncxx::builder::basic::make_document(
             bsoncxx::builder::basic::kvp("user_id", user_id),
-            bsoncxx::builder::basic::kvp("key", bonus_key),
-            bsoncxx::builder::basic::kvp("end_date", now + bonus_period),
-            bsoncxx::builder::basic::kvp("active", true)
+            bsoncxx::builder::basic::kvp("key", vless_client.vless_uri),
+            bsoncxx::builder::basic::kvp("email", vless_client.email),
+            bsoncxx::builder::basic::kvp("active", vless_client.enabled),
+            bsoncxx::builder::basic::kvp("end_date", static_cast<int64_t>(vless_client.expiry_time))
         )
     );
 
@@ -217,15 +229,16 @@ bool CreatePromo(int64_t user_id)
     if (existing)
         return false;
 
-    std::string bonus_key = "test";
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+    std::stringstream email;
 
     auto result = promo_col.insert_one(
         bsoncxx::builder::basic::make_document(
             bsoncxx::builder::basic::kvp("promo", promo),
             bsoncxx::builder::basic::kvp("aviable_uses", aviable_uses),
-            bsoncxx::builder::basic::kvp("end_date", end_date),
-            bsoncxx::builder::basic::kvp("bonus_period", bonus_period),
-            bsoncxx::builder::basic::kvp("bonus", bonus_key)
+            bsoncxx::builder::basic::kvp("end_date", end_date + now_time * 1000),
+            bsoncxx::builder::basic::kvp("bonus_period", bonus_period)
         )
     );
 

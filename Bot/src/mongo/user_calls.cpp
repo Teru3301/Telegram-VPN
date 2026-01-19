@@ -30,7 +30,7 @@ std::vector<Key> FindKeys(const int user_id)
             continue;
 
         Key key;
-        key.key = std::string(
+        key.vless_uri = std::string(
             view["key"].get_string().value
         );
         key.end_date = view["end_date"].get_int64().value;

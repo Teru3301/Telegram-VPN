@@ -1,14 +1,14 @@
 services:
   mongo:
+    network_mode: host
     image: mongo:7.0
     container_name: mongodb
-    restart: unless-stopped
-    ports:
-      - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    restart: unless-stopped
 
   bot:
+    network_mode: host
     build: .
     container_name: telegram-vpn-bot
     depends_on:
@@ -16,6 +16,7 @@ services:
     environment:
       TG_BOT_TOKEN: ${TG_BOT_TOKEN}
       MONGO_URI: ${MONGO_URI}
+      XUI_URL: ${XUI_URL}
     restart: unless-stopped
 
 volumes:

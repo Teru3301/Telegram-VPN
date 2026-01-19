@@ -17,11 +17,13 @@ MessageView Profile(int64_t user_id)
 
     for (auto key : keys)
     {
-        std::time_t t = static_cast<std::time_t>(key.end_date);
+        auto end_time = std::chrono::system_clock::from_time_t(0) + 
+                   std::chrono::milliseconds(key.end_date);
+        std::time_t t = std::chrono::system_clock::to_time_t(end_time);
         std::tm tm{};
         localtime_r(&t, &tm);
         text 
-        << "<code>" << key.key << "</code>\n"
+        << "<code>" << key.vless_uri << "</code>\n"
         << "Дата окончания: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "\n"
         << "⬇️ Скачано: " << key.d_gb << "GB\n"
         << "⬆️ Отправлено: " << key.u_gb << "GB\n\n";

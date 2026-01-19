@@ -25,7 +25,7 @@ std::string GetToken()
 
 void AddTgAdmin()
 {
-    while (false)
+    while (true)
     {
         std::cout << "Add a new Telegram administrator? (y/n): ";
         std::string answer;

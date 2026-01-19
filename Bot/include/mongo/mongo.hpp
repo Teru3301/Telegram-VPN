@@ -15,7 +15,7 @@ public:
     Database();
     static Database& instance();
 
-    mongocxx::database& getDB() { return db_; }  // <-- добавляем getter
+    mongocxx::database& getDB() { return db_; }
 
 private:
     mongocxx::client client_;

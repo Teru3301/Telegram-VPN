@@ -10,7 +10,7 @@
 int main()
 {
     if (!xui::Service::GetConnection()) return 1;
-    AddTgAdmin();
+    //AddTgAdmin();
     TgBot::Bot bot{GetToken()};
 
     CommandDispatcher cmd_dispatcher;

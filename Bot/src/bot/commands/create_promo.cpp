@@ -13,10 +13,10 @@ MessageView PromoEndDate(int64_t user_id)
 
     TgBot::InlineKeyboardMarkup::Ptr keyboard(new TgBot::InlineKeyboardMarkup);
 
-    keyboard->inlineKeyboard.push_back({MakeButton("1 час", "promo_end:3600")});
-    keyboard->inlineKeyboard.push_back({MakeButton("1 день", "promo_end:86400")});
-    keyboard->inlineKeyboard.push_back({MakeButton("7 дней", "promo_end:604800")});
-    keyboard->inlineKeyboard.push_back({MakeButton("30 дней", "promo_end:2592000")});
+    keyboard->inlineKeyboard.push_back({MakeButton("1 час", "promo_end:3600000")});
+    keyboard->inlineKeyboard.push_back({MakeButton("1 день", "promo_end:86400000")});
+    keyboard->inlineKeyboard.push_back({MakeButton("7 дней", "promo_end:604800000")});
+    keyboard->inlineKeyboard.push_back({MakeButton("30 дней", "promo_end:2592000000")});
     keyboard->inlineKeyboard.push_back({MakeButton("🔙 Отмена", "start")});
 
     return {
@@ -100,10 +100,10 @@ MessageView PromoBonus(int64_t user_id)
 
     TgBot::InlineKeyboardMarkup::Ptr keyboard(new TgBot::InlineKeyboardMarkup);
 
-    keyboard->inlineKeyboard.push_back({MakeButton("1 час", "bonus:3600")});
-    keyboard->inlineKeyboard.push_back({MakeButton("1 день", "bonus:86400")});
-    keyboard->inlineKeyboard.push_back({MakeButton("7 дней", "bonus:604800")});
-    keyboard->inlineKeyboard.push_back({MakeButton("30 дней", "bonus:2592000")});
+    keyboard->inlineKeyboard.push_back({MakeButton("1 час", "bonus:3600000")});
+    keyboard->inlineKeyboard.push_back({MakeButton("1 день", "bonus:86400000")});
+    keyboard->inlineKeyboard.push_back({MakeButton("7 дней", "bonus:604800000")});
+    keyboard->inlineKeyboard.push_back({MakeButton("30 дней", "bonus:2592000000")});
     keyboard->inlineKeyboard.push_back({MakeButton("🔙 Отмена", "start")});
 
     return {
