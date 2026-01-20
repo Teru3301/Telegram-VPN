@@ -1,12 +1,12 @@
 
 #include <tgbot/tgbot.h>
 #include "bot/commands.hpp"
-#include "mongo/config.hpp"
+#include "services/users.hpp"
 
 
 MessageView Start(int64_t user_id)
 {
-    SetState(user_id, UserState::Idle);
+    service::users::SetState(user_id, UserState::Idle);
     
     std::ostringstream text;
     text 
@@ -29,7 +29,7 @@ MessageView Start(int64_t user_id)
 
     keyboard->inlineKeyboard.push_back(row);
 
-    if (IsAdmin(user_id))
+    if (service::users::IsAdmin(user_id))
     {
         text 
         << "\n\nВы назначены администратором этого бота";
@@ -53,7 +53,7 @@ public:
         Log("[" + std::to_string(msg->from->id) + "] StartCommand");
         Log(msg);
 
-        bool reg_ok = RegisterUser(msg->from->id, msg->from->username);
+        bool reg_ok = service::users::RegisterNew(msg->from->id, msg->from->username);
         Log(reg_ok ? "A new user has registered" : "The user was not registered");
 
         auto view = Start(msg->from->id);
@@ -107,7 +107,7 @@ public:
         }
 
 
-        bool reg_ok = RegisterUser(query->from->id, query->from->username);
+        bool reg_ok = service::users::RegisterNew(query->from->id, query->from->username);
         Log(reg_ok ? "A new user has registered" : "The user was not registered");
     }
 };

@@ -1,11 +1,12 @@
 
 #include "bot/commands.hpp"
-#include "mongo/user_calls.hpp"
+#include "services/users.hpp"
+#include "services/promo.hpp"
 
 
 MessageView OnIdle(TgBot::Message::Ptr msg)
 {
-    SetState(msg->from->id, UserState::Idle);
+    service::users::SetState(msg->from->id, UserState::Idle);
     
     std::ostringstream text;
     text
@@ -23,18 +24,18 @@ MessageView OnIdle(TgBot::Message::Ptr msg)
 
 MessageView OnWaitPromo(TgBot::Message::Ptr msg)
 {
-    SetState(msg->from->id, UserState::Idle);
+    service::users::SetState(msg->from->id, UserState::Idle);
     
     std::ostringstream text;
     TgBot::InlineKeyboardMarkup::Ptr keyboard(new TgBot::InlineKeyboardMarkup);
     
-    if (!CheckPromo(msg->text))
+    if (!service::promo::Check(msg->text))
     {
         text << "Промокод не верный или истёк";
     }
     else 
     {
-        if (UsePromo(msg->from->id, msg->text))
+        if (service::promo::Use(msg->from->id, msg->text))
         {
             text 
                 << "Промокод успешно активирован!\n"
@@ -79,10 +80,10 @@ MessageView OnEnterAviableUses(TgBot::Message::Ptr msg)
             throw std::invalid_argument("invalid range");
 
         // сохраняем значение в черновик
-        SetPromoDraftUses(msg->from->id, uses);
+        service::promo::SetDraftUses(msg->from->id, uses);
 
         text << "Введите промокод (например FREEVPN)";
-        SetState(msg->from->id, UserState::CreatePromoEnterPromocode);
+        service::users::SetState(msg->from->id, UserState::CreatePromoEnterPromocode);
     }
     catch (const std::exception& e)
     {
@@ -92,7 +93,7 @@ MessageView OnEnterAviableUses(TgBot::Message::Ptr msg)
             MakeButton("🔁 Ввести ещё раз", "bonus")
         });
 
-        SetState(msg->from->id, UserState::Idle);
+        service::users::SetState(msg->from->id, UserState::Idle);
     }
 
     keyboard->inlineKeyboard.push_back({
@@ -112,18 +113,18 @@ MessageView OnEnterPromocode(TgBot::Message::Ptr msg)
     TgBot::InlineKeyboardMarkup::Ptr keyboard(new TgBot::InlineKeyboardMarkup);
     std::string promo = msg->text;
     //  валидация ввода
-    if (!CheckPromo(promo))
+    if (!service::promo::Check(promo))
     {
-        SetPromoDraftPromo(msg->from->id, promo);
+        service::promo::SetDraftPromo(msg->from->id, promo);
         text << "Подтвердите создание промокода";
-        SetState(msg->from->id, UserState::Idle);
+        service::users::SetState(msg->from->id, UserState::Idle);
         std::vector<TgBot::InlineKeyboardButton::Ptr> row;
         keyboard->inlineKeyboard.push_back({MakeButton("Создать", "confirm_create_promo")});
     }
     else 
     {
         text << "Что-то не так! Возможно такой промокод уже существует. Попробуйте ввести ещё раз";
-        SetState(msg->from->id, UserState::CreatePromoEnterPromocode);
+        service::users::SetState(msg->from->id, UserState::CreatePromoEnterPromocode);
     }
 
     keyboard->inlineKeyboard.push_back({MakeButton("🔙 Отмена", "start")});
@@ -137,7 +138,7 @@ MessageView OnEnterPromocode(TgBot::Message::Ptr msg)
 
 MessageView OnError(TgBot::Message::Ptr msg)
 {
-    SetState(msg->from->id, UserState::Idle);
+    service::users::SetState(msg->from->id, UserState::Idle);
     
     std::ostringstream text;
     text
@@ -161,7 +162,7 @@ public:
 
     void execute(TgBot::Bot& bot, TgBot::Message::Ptr msg) override {
         
-        UserState state = GetState(msg->from->id);
+        UserState state = service::users::GetState(msg->from->id);
         Log("[" + std::to_string(msg->from->id) + "] Any message");
         Log(msg);
 

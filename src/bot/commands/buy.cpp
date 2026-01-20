@@ -2,11 +2,12 @@
 #include "bot/commands.hpp"
 #include <sstream>
 #include <iomanip>
+#include "services/users.hpp"
 
 
 MessageView Buy(int64_t user_id)
 {
-    SetState(user_id, UserState::Idle);
+    service::users::SetState(user_id, UserState::Idle);
     
     std::ostringstream text;
     text << "Приобрести подписку на VPN";

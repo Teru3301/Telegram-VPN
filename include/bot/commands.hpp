@@ -3,7 +3,6 @@
 #include "loger.hpp"
 #include <memory>
 #include "bot/command.hpp"
-#include "mongo/user_calls.hpp"
 
 
 std::unique_ptr<Command> createStartCommand();

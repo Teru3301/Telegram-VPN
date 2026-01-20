@@ -1,10 +1,11 @@
 
 #include "bot/commands.hpp"
+#include "services/users.hpp"
 
 
 MessageView HowToUse (int64_t user_id)
 {
-    SetState(user_id, UserState::Idle);
+    service::users::SetState(user_id, UserState::Idle);
     
     std::ostringstream text;
     text

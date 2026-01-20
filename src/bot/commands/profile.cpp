@@ -2,13 +2,15 @@
 #include "bot/commands.hpp"
 #include <sstream>
 #include <iomanip>
+#include "services/users.hpp"
+#include "services/keys.hpp"
 
 
 MessageView Profile(int64_t user_id)
 {
-    SetState(user_id, UserState::Idle);
+    service::users::SetState(user_id, UserState::Idle);
     
-    std::vector<Key> keys = FindKeys(user_id);
+    std::vector<Key> keys = service::keys::FindAll(user_id);
     
     std::ostringstream text;
     text

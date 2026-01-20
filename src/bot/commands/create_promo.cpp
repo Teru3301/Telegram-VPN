@@ -1,12 +1,14 @@
 
 #include "bot/commands.hpp"
+#include "services/users.hpp"
+#include "services/promo.hpp"
 
 
 MessageView PromoEndDate(int64_t user_id)
 {
-    SetState(user_id, UserState::Idle);
-    
-    CreatePromoDraft(user_id);
+    service::users::SetState(user_id, UserState::Idle);
+   
+    service::promo::CreateDraft(user_id);
 
     std::ostringstream text;
     text << "Выберите срок жизни промокода:";
@@ -92,7 +94,7 @@ public:
 
 MessageView PromoBonus(int64_t user_id)
 {
-    SetState(user_id, UserState::Idle);
+    service::users::SetState(user_id, UserState::Idle);
     
     std::ostringstream text;
     text
@@ -130,7 +132,7 @@ public:
         {
             Log(data);
             auto seconds = std::stoll(data.substr(data.find(":") + 1));
-            SetPromoDraftEndDate(query->from->id, seconds);
+            service::promo::SetDraftEndDate(query->from->id, seconds);
         }
 
         try 
@@ -163,7 +165,7 @@ public:
 
 MessageView PromoPromo(int64_t user_id)
 {
-    SetState(user_id, UserState::CreatePromoAviableUses);
+    service::users::SetState(user_id, UserState::CreatePromoAviableUses);
     
     std::ostringstream text;
     text
@@ -197,7 +199,7 @@ public:
         {
             Log(data);
             auto seconds = std::stoll(data.substr(data.find(":") + 1));
-            SetPromoDraftBonus(query->from->id, seconds);
+            service::promo::SetDraftBonus(query->from->id, seconds);
         }
 
         try 
@@ -231,11 +233,11 @@ public:
 
 MessageView ConfirmCreatePromo(int64_t user_id)
 {
-    SetState(user_id, UserState::Idle);
+    service::users::SetState(user_id, UserState::Idle);
     std::ostringstream text;
     TgBot::InlineKeyboardMarkup::Ptr keyboard(new TgBot::InlineKeyboardMarkup);
     
-    if (CreatePromo(user_id))
+    if (service::promo::CreateByDraft(user_id))
     {
         text << "Промокод успешно создан!";
     }

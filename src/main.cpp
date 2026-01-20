@@ -7,6 +7,7 @@
 #include "xui/services.hpp"
 #include "loger.hpp"
 #include <cstdlib>
+#include "mongo/mongo.hpp"
 
 
 int main()
