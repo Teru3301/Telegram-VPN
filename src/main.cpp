@@ -5,10 +5,35 @@
 #include "bot/dispatcher.hpp"
 #include "bot/commands.hpp"
 #include "xui/services.hpp"
+#include "loger.hpp"
+#include <cstdlib>
 
 
 int main()
 {
+    const char* MONGO_URI = std::getenv("MONGO_URI");
+    if (!MONGO_URI)
+    {
+        Log("MONGO_URI not set");
+        throw std::runtime_error("MONGO_URI not set");
+    }
+    const char* TG_BOT_TOKEN = std::getenv("TG_BOT_TOKEN");
+    if (!TG_BOT_TOKEN)
+    {
+        Log("TG_BOT_TOKEN not set");
+        throw std::runtime_error("TG_BOT_TOKEN not set");
+    }
+    const char* XUI_URL = std::getenv("XUI_URL");
+    if (!XUI_URL)
+    {
+        Log("XUI_URL not set");
+        throw std::runtime_error("XUI_URL not set");
+    }
+
+    Database::init(MONGO_URI, "test_db");
+
+
+
     if (!xui::Service::GetConnection()) return 1;
     //AddTgAdmin();
     TgBot::Bot bot{GetToken()};

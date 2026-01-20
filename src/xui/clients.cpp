@@ -12,17 +12,19 @@ namespace xui
 
 Client Service::CreateKey(uint64_t expiry_time, uint64_t tg_uid)
 {
+    Client vless_client = utils::GetClient("");
+    
     if (!GetConnection())
     {
         Log("[3x-ui] no connection");
-        return {};
+        return vless_client;
     }
 
     auto cfg = GetConfig();
     if (cfg.inbound_id <= 0)
     {
         Log("[3x-ui] bad inbound id");
-        return {};
+        return vless_client;
     }
 
     auto now = std::chrono::system_clock::now();
@@ -62,7 +64,7 @@ Client Service::CreateKey(uint64_t expiry_time, uint64_t tg_uid)
     if (!res || res->status != 200)
     {
         Log("[3x-ui] bad res status");
-        return {};
+        return vless_client;
     }
 
     auto j = nlohmann::json::parse(res->body);
@@ -75,9 +77,7 @@ Client Service::CreateKey(uint64_t expiry_time, uint64_t tg_uid)
     else if (j["success"] == true)
         Log("[3x-ui] add client success");
 
-    Client vless_client = utils::GetClient(email.str());
-
-    return vless_client;
+    return utils::GetClient(email.str());
 }
 
 
