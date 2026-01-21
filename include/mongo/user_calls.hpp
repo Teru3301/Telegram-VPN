@@ -6,13 +6,9 @@
 #include "models.hpp"
 
 
-bool CheckUserRegistration(const int id);
-bool RegisterUser(const int id, const std::string& usertag);
-
 UserState GetState (int64_t user_id);
 void SetState (int64_t user_id, const UserState& state);
 
-bool CheckPromo(const std::string& promo);
 bool UsePromo(int64_t user_id, const std::string& promo);
 
 std::vector<Key> FindKeys(const int user_id);

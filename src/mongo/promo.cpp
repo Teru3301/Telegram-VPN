@@ -5,20 +5,6 @@
 #include <chrono>
 
 
-bool CheckPromo(const std::string& promo)
-{
-    auto col = Database::instance().getDB()["promo"];
-
-    return static_cast<bool>(
-        col.find_one(
-            bsoncxx::builder::basic::make_document(
-                bsoncxx::builder::basic::kvp("promo", promo)
-            )
-        )
-    );
-}
-
-
 bool UsePromo(int64_t user_id, const std::string& promo)
 {
     auto db = Database::instance().getDB();

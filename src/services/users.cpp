@@ -1,6 +1,7 @@
 
 #include "services/users.hpp"
 #include "mongo/mongo.hpp"
+#include "mongo/core.hpp"
 
 
 namespace service::users 
@@ -10,98 +11,68 @@ namespace service::users
 //  Проверяет, зарегистрирован ли пользователь
 bool CheckRegistration(const int64_t user_id)
 {
-    auto collection = Database::instance().getDB()["tg_users"];
-
-    auto result = collection.find_one(
-        bsoncxx::builder::basic::make_document(
-            bsoncxx::builder::basic::kvp("user_id", user_id)
-        )
-    );
-
-    return static_cast<bool>(result);
+    return mongo::Exist("tg_users", "user_id", user_id);
 }
 
 
 //  Регистрирует нового пользователя
 bool RegisterNew(const int64_t user_id, const std::string& user_tag)
 {
-    auto db = Database::instance().getDB();
-
-    mongocxx::collection users_col  = db["tg_users"];
-
-    users_col.update_one(
+    return mongo::InsertIfNotExist(
+        "tg_users",
         bsoncxx::builder::basic::make_document(
             bsoncxx::builder::basic::kvp("user_id", user_id)
         ),
         bsoncxx::builder::basic::make_document(
-            bsoncxx::builder::basic::kvp(
-                "$setOnInsert",
-                bsoncxx::builder::basic::make_document(
-                    bsoncxx::builder::basic::kvp("user_id", user_id),
-                    bsoncxx::builder::basic::kvp("usertag", user_tag),
-                    bsoncxx::builder::basic::kvp("state", "Idle")
-                )
-            )
-        ),
-        mongocxx::options::update{}.upsert(true)
+            bsoncxx::builder::basic::kvp("user_id", user_id),
+            bsoncxx::builder::basic::kvp("usertag", user_tag),
+            bsoncxx::builder::basic::kvp("state", "Idle")
+        )
     );
-    
-    return CheckRegistration(user_id);
 }
 
 
 //  Проверяет по юзертегу, явлется ли пользователь администратором
 bool IsAdmin(const std::string& user_tag)
 {
-    return false;
+    return mongo::Exist("admins", "user_id", user_tag);
 }
 
 
 //  Проверяет, явлется ли пользователь администратором
 bool IsAdmin(const int64_t user_id)
 {
-    auto db = Database::instance().getDB();
-    mongocxx::collection admins_col = db["admins"];
-
-    auto result = admins_col.find_one(
-        bsoncxx::builder::basic::make_document(
-            bsoncxx::builder::basic::kvp("user_id", user_id)
-        )
-    );
-
-    return result.has_value();
+    return mongo::Exist("admins", "user_id", user_id);
 }
 
 
 //  Назначает пользователя администратором по id
 bool SetAdmin(const int64_t user_id)
 {
-    return false;
+    return mongo::InsertIfNotExist(
+        "admins",
+        bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("usertag", user_id)
+        ),
+        bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("usertag", user_id)
+        )
+    );
 }
 
 
 //  Назначает пользователя администратором по юзертегу 
 bool SetAdmin(const std::string& user_tag)
 {
-    auto db = Database::instance().getDB();
-    mongocxx::collection admins_col = db["admins"];
-
-    auto existing = admins_col.find_one(
+    return mongo::InsertIfNotExist(
+        "admins",
+        bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("usertag", user_tag)
+        ),
         bsoncxx::builder::basic::make_document(
             bsoncxx::builder::basic::kvp("usertag", user_tag)
         )
-    );
-
-    if (existing)
-        return false; 
-
-    auto result = admins_col.insert_one(
-        bsoncxx::builder::basic::make_document(
-            bsoncxx::builder::basic::kvp("usertag", user_tag)
-        )
-    );
-
-    return static_cast<bool>(result);
+    ); 
 }
 
 

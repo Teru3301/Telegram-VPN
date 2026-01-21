@@ -1,6 +1,7 @@
 
 #include "services/promo.hpp"
 #include "mongo/user_calls.hpp"
+#include "mongo/core.hpp"
 
 
 namespace service::promo
@@ -10,14 +11,15 @@ namespace service::promo
 //  Ищет сопадение по названию
 bool Find(const std::string& promo)
 {
-    return CheckPromo(promo);
+    return mongo::Exist("promo", "promo", promo);
 }
 
 
 //  Проверяет, можно ли использовать промокод
 bool Check(const std::string& promo)
 {
-    return true;
+    //  TODO
+    return mongo::Exist("promo", "promo", promo);
 }
 
 
@@ -70,6 +72,7 @@ bool SetDraftUses(int64_t user_id, int64_t uses)
 //  Задаёт название промокода
 bool SetDraftPromo(int64_t user_id, const std::string& promo)
 {
+    if (Find(promo)) return false;
     SetPromoDraftPromo(user_id, promo);
     return false;
 }

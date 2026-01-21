@@ -2,6 +2,7 @@
 #include "services/keys.hpp"
 #include "xui/services.hpp"
 #include "mongo/user_calls.hpp"
+#include "mongo/core.hpp"
 
 
 namespace service::keys
@@ -34,8 +35,7 @@ std::vector<Key> FindAll(int64_t user_id)
 //  Проверяет существование ключа
 bool Find(const std::string& email)
 {
-    Key key = mongo::Find(email);
-    return key.active;
+    return mongo::Exist("vless_keys", "email", email);
 }
 
 
