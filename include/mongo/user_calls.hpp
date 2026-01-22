@@ -14,10 +14,6 @@ bool UsePromo(int64_t user_id, const std::string& promo);
 std::vector<Key> FindKeys(const int user_id);
 
 void CreatePromoDraft(int64_t user_id);
-void SetPromoDraftEndDate(int64_t user_id, int64_t seconds);
-void SetPromoDraftBonus(int64_t user_id, int64_t seconds);
-void SetPromoDraftUses(int64_t user_id, int64_t uses);
-void SetPromoDraftPromo(int64_t user_id, std::string uses);
 bool CreatePromo(int64_t user_id);
 
 namespace mongo

@@ -122,54 +122,6 @@ void CreatePromoDraft(int64_t user_id)
 }
 
 
-void SetPromoDraftEndDate(int64_t user_id, int64_t seconds)
-{
-    auto col = Database::instance().getDB()["promo_drafts"];
-    col.update_one(
-        bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("user_id", user_id)),
-        bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("$set", bsoncxx::builder::basic::make_document(
-            bsoncxx::builder::basic::kvp("end_date", seconds)
-        )))
-    );
-}
-
-
-void SetPromoDraftBonus(int64_t user_id, int64_t seconds)
-{
-    auto col = Database::instance().getDB()["promo_drafts"];
-    col.update_one(
-        bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("user_id", user_id)),
-        bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("$set", bsoncxx::builder::basic::make_document(
-            bsoncxx::builder::basic::kvp("bonus_period", seconds)
-        )))
-    );
-}
-
-
-void SetPromoDraftUses(int64_t user_id, int64_t uses)
-{
-    auto col = Database::instance().getDB()["promo_drafts"];
-    col.update_one(
-        bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("user_id", user_id)),
-        bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("$set", bsoncxx::builder::basic::make_document(
-            bsoncxx::builder::basic::kvp("aviable_uses", uses)
-        )))
-    );
-}
-
-
-void SetPromoDraftPromo(int64_t user_id, std::string promo)
-{
-    auto col = Database::instance().getDB()["promo_drafts"];
-    col.update_one(
-        bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("user_id", user_id)),
-        bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("$set", bsoncxx::builder::basic::make_document(
-            bsoncxx::builder::basic::kvp("promo", promo)
-        )))
-    );
-}
-
-
 bool CreatePromo(int64_t user_id)
 {
     auto db = Database::instance().getDB();

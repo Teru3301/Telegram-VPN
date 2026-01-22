@@ -94,14 +94,14 @@ UserState GetState(const int64_t user_id)
 //  Задаёт состояни бота для пользователя
 bool SetState(const int64_t user_id, const UserState& state)
 {
-    Database::instance().getDB()["tg_users"].update_one(
+    return mongo::UpdateField(
+        "tg_users",
         bsoncxx::builder::basic::make_document(
-        bsoncxx::builder::basic::kvp("user_id", user_id)),
-            bsoncxx::builder::basic::make_document(
-            bsoncxx::builder::basic::kvp("$set", bsoncxx::builder::basic::make_document(
-            bsoncxx::builder::basic::kvp("state", StateToString(state)))))
+            bsoncxx::builder::basic::kvp("user_id", user_id)
+        ),
+        "state",
+        bsoncxx::types::b_string{StateToString(state)}
     );
-    return true;
 }
 
 

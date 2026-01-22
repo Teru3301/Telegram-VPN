@@ -106,5 +106,37 @@ bool InsertIfNotExist(
 }
 
 
+bool UpdateField(
+    const std::string& document,
+    const bsoncxx::document::view& filter,
+    const std::string& field,
+    const bsoncxx::types::bson_value::value& value
+)
+{
+    try
+    {
+        auto col = Database::instance().getDB()[document];
+
+        auto result = col.update_one(
+            filter,
+            bsoncxx::builder::basic::make_document(
+                bsoncxx::builder::basic::kvp(
+                    "$set",
+                    bsoncxx::builder::basic::make_document(
+                        bsoncxx::builder::basic::kvp(field, value)
+                    )
+                )
+            )
+        );
+
+        return result && result->modified_count() > 0;
+    }
+    catch (...)
+    {
+        return false;
+    }
+}
+
+
 }
 

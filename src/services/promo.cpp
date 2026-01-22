@@ -48,24 +48,42 @@ bool DeleteDraft(int64_t user_id)
 //  Задаёт дату окончания действия промокода
 bool SetDraftEndDate(int64_t user_id, int64_t time)
 {
-    SetPromoDraftEndDate(user_id, time);
-    return true;
+    return mongo::UpdateField(
+        "promo_drafts",
+        bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("user_id", user_id)
+        ),
+        "end_date",
+        bsoncxx::types::b_int64{time}
+    );
 }
 
 
 //  Задаёт время действия бонусного кода после активации промокода
 bool SetDraftBonus(int64_t user_id, int64_t time)
 {
-    SetPromoDraftBonus(user_id, time);
-    return false;
+    return mongo::UpdateField(
+        "promo_drafts",
+        bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("user_id", user_id)
+        ),
+        "bonus_period",
+        bsoncxx::types::b_int64{time}
+    );
 }
 
 
 //  Задаёт количество использований прокомода
 bool SetDraftUses(int64_t user_id, int64_t uses)
 {
-    SetPromoDraftUses(user_id, uses);
-    return false;
+    return mongo::UpdateField(
+        "promo_drafts",
+        bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("user_id", user_id)
+        ),
+        "uses",
+        bsoncxx::types::b_int64{uses}
+    );
 }
 
 
@@ -73,8 +91,15 @@ bool SetDraftUses(int64_t user_id, int64_t uses)
 bool SetDraftPromo(int64_t user_id, const std::string& promo)
 {
     if (Find(promo)) return false;
-    SetPromoDraftPromo(user_id, promo);
-    return false;
+
+    return mongo::UpdateField(
+        "promo_drafts",
+        bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("user_id", user_id)
+        ),
+        "promo",
+        bsoncxx::types::b_string{promo}
+    );
 }
 
 
