@@ -3,6 +3,7 @@
 #include <iostream>
 #include <mongo/config.hpp>
 #include <cstdlib>
+#include "services/users.hpp"
 
 
 std::string GetToken()
@@ -53,7 +54,7 @@ void AddTgAdmin()
             continue;
         }
 
-        if (AddAdmin(username))
+        if (service::users::SetAdmin(username))
         {
             std::cout << "Administrator @" << username << " added successfully.\n";
         }

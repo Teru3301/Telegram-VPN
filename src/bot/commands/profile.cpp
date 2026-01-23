@@ -19,8 +19,7 @@ MessageView Profile(int64_t user_id)
 
     for (auto key : keys)
     {
-        auto end_time = std::chrono::system_clock::from_time_t(0) + 
-                   std::chrono::milliseconds(key.end_date);
+        auto end_time = std::chrono::system_clock::from_time_t(key.end_date);
         std::time_t t = std::chrono::system_clock::to_time_t(end_time);
         std::tm tm{};
         localtime_r(&t, &tm);

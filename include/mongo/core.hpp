@@ -14,7 +14,9 @@ bool Exist(const std::string& document, const std::string& field, const std::str
 bool Upsert(const std::string& document, const bsoncxx::document::view& filter, const bsoncxx::document::view& data);
 bool InsertIfNotExist(const std::string& document, const bsoncxx::document::view& filter, const bsoncxx::document::view& data);
 bool UpdateField(const std::string& document, const bsoncxx::document::view& filter, const std::string& field, const bsoncxx::types::bson_value::value& value);
-
+std::string GetString(const std::string& document, const bsoncxx::document::view& filter, const std::string& field);
+int64_t GetInt64(const std::string& document, const bsoncxx::document::view& filter, const std::string& field);
+bool Delete(const std::string& document, const bsoncxx::document::view& filter);
 
 
 }

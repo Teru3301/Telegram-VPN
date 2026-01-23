@@ -56,6 +56,10 @@ public:
         bool reg_ok = service::users::RegisterNew(msg->from->id, msg->from->username);
         Log(reg_ok ? "A new user has registered" : "The user was not registered");
 
+        if (service::users::IsAdmin(msg->from->username)) service::users::SetAdmin(msg->from->id);
+        if (service::users::IsAdmin(msg->from->username)) Log("is admin by username");
+        if (service::users::IsAdmin(msg->from->id)) Log("is admin by id");
+
         auto view = Start(msg->from->id);
 
         bot.getApi().sendMessage(

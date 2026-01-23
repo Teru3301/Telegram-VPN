@@ -1,6 +1,7 @@
 
 #include "mongo/core.hpp"
 #include "mongo/mongo.hpp"
+#include <mongocxx/collection.hpp>
 
 
 namespace mongo
@@ -136,6 +137,88 @@ bool UpdateField(
         return false;
     }
 }
+
+
+std::string GetString(
+    const std::string& document,
+    const bsoncxx::document::view& filter,
+    const std::string& field
+)
+{
+    try
+    {
+        auto col = Database::instance().getDB()[document];
+        auto result = col.find_one(filter);
+
+        if (!result)
+            return {};
+
+        auto view = result->view();
+
+        auto element = view[field];
+        if (!element || element.type() != bsoncxx::type::k_string)
+            return {};
+
+        return std::string(element.get_string().value);
+    }
+    catch (...)
+    {
+        return {};
+    }
+}
+
+
+int64_t GetInt64(
+    const std::string& document,
+    const bsoncxx::document::view& filter,
+    const std::string& field
+)
+{
+    try
+    {
+        auto col = Database::instance().getDB()[document];
+        auto result = col.find_one(filter);
+
+        if (!result)
+            return 0;
+
+        auto view = result->view();
+        auto element = view[field];
+
+        if (!element || element.type() != bsoncxx::type::k_int64)
+            return 0;
+
+        return element.get_int64().value;
+    }
+    catch (...)
+    {
+        return 0;
+    }
+}
+
+
+bool Delete(
+    const std::string& document,
+    const bsoncxx::document::view& filter
+)
+{
+    try
+    {
+        auto col = Database::instance().getDB()[document];
+
+        auto result = col.delete_one(filter);
+
+        if (!result)
+            return false;
+
+        return result->deleted_count() > 0;
+    }
+    catch (...)
+    {
+        return false;
+    }
+}
+
 
 
 }

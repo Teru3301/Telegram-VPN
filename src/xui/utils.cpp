@@ -168,6 +168,8 @@ Client utils::GetClient(const std::string& email)
 
                 result.email = email;
                 result.expiry_time = client["expiryTime"];
+                result.expiry_time = result.expiry_time / 1000;
+                Log("[3x-ui] expiryTime: " + std::to_string(result.expiry_time));
                 result.enabled = client["enable"];
 
                 std::string uuid = client["id"];
@@ -175,7 +177,6 @@ Client utils::GetClient(const std::string& email)
                 result.vless_uri = BuildVlessKey(
                     uuid,
                     "127.0.0.1",
-                    //cfg.uri,
                     port,
                     public_key,
                     short_id,

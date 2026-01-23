@@ -35,7 +35,7 @@ bool RegisterNew(const int64_t user_id, const std::string& user_tag)
 //  Проверяет по юзертегу, явлется ли пользователь администратором
 bool IsAdmin(const std::string& user_tag)
 {
-    return mongo::Exist("admins", "user_id", user_tag);
+    return mongo::Exist("admins", "user_tag", user_tag);
 }
 
 
@@ -52,10 +52,10 @@ bool SetAdmin(const int64_t user_id)
     return mongo::InsertIfNotExist(
         "admins",
         bsoncxx::builder::basic::make_document(
-            bsoncxx::builder::basic::kvp("usertag", user_id)
+            bsoncxx::builder::basic::kvp("user_id", user_id)
         ),
         bsoncxx::builder::basic::make_document(
-            bsoncxx::builder::basic::kvp("usertag", user_id)
+            bsoncxx::builder::basic::kvp("user_id", user_id)
         )
     );
 }
@@ -67,10 +67,10 @@ bool SetAdmin(const std::string& user_tag)
     return mongo::InsertIfNotExist(
         "admins",
         bsoncxx::builder::basic::make_document(
-            bsoncxx::builder::basic::kvp("usertag", user_tag)
+            bsoncxx::builder::basic::kvp("user_tag", user_tag)
         ),
         bsoncxx::builder::basic::make_document(
-            bsoncxx::builder::basic::kvp("usertag", user_tag)
+            bsoncxx::builder::basic::kvp("user_tag", user_tag)
         )
     ); 
 }
@@ -79,15 +79,15 @@ bool SetAdmin(const std::string& user_tag)
 //  Возвращает текущее состояние бота для пользователя
 UserState GetState(const int64_t user_id)
 {
-    auto collection = Database::instance().getDB()["tg_users"];
-    auto result = collection.find_one(
-            bsoncxx::builder::basic::make_document(
-                bsoncxx::builder::basic::kvp("user_id", user_id)
-                )
-            );
+    std::string state = mongo::GetString(
+        "tg_users",
+        bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("user_id", user_id)
+        ),
+        "state"
+    );
 
-    std::string state = std::string(result->view()["state"].get_string().value);
-    return StringToState(state);
+    return state.empty() ? UserState::Idle : StringToState(state);
 }
 
 
