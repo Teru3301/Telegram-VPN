@@ -2,27 +2,17 @@
 #pragma once
 
 #include "mongo/mongo.hpp"
-#include "bot/UserState.hpp"
 #include "models.hpp"
 
 
-UserState GetState (int64_t user_id);
-void SetState (int64_t user_id, const UserState& state);
-
-bool UsePromo(int64_t user_id, const std::string& promo);
-
-std::vector<Key> FindKeys(const int user_id);
-
-void CreatePromoDraft(int64_t user_id);
-bool CreatePromo(int64_t user_id);
-
+//  TODO
+//  DELETE
 namespace mongo
 {
 
 
 bool AddVlessKey(const Key& key, const int64_t user_id);
-std::vector<Key> FindAll(const int64_t user_id);        // DELETE
-Key Find(const std::string& email);
+std::vector<Key> FindAll(const int64_t user_id);
 
 
 }

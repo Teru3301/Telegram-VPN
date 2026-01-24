@@ -1,7 +1,6 @@
 
 #include "config.hpp" 
 #include <iostream>
-#include <mongo/config.hpp>
 #include <cstdlib>
 #include "services/users.hpp"
 
@@ -13,14 +12,7 @@ std::string GetToken()
     {
         return std::string(env_token);
     }
-
-    std::string token = GetTgBotToken();
-    if (token == "")
-    {
-        std::cerr << "Error: TG_BOT_TOKEN environment variable is not set.\n";
-        std::exit(1); 
-    }
-    return token;
+    return "";
 }
 
 
