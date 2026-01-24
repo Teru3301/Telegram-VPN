@@ -51,6 +51,11 @@ int64_t GetInt64(
         const bsoncxx::document::view& filter, 
         const std::string& field
         );
+std::vector<int64_t> GetAllInt(
+        const std::string& document, 
+        const bsoncxx::document::view& filter, 
+        const std::string& field
+        );
 bool Delete(
         const std::string& document, 
         const bsoncxx::document::view& filter

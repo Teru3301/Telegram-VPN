@@ -1,9 +1,9 @@
 
 #include "services/promo.hpp"
 #include "services/keys.hpp"
-#include "mongo/user_calls.hpp"
 #include "mongo/core.hpp"
-#include "xui/services.hpp"
+#include <bsoncxx/types/bson_value/value.hpp>
+#include <bsoncxx/builder/basic/array.hpp>
 
 
 namespace service::promo
@@ -42,28 +42,32 @@ bool Use(int64_t user_id, const std::string& promo)
 {
     if (!Check(promo)) return false;
 
-    int64_t uses = mongo::GetInt64(
-        "promo",
-        bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("promo", promo)),
-        "uses"
+    auto filter = bsoncxx::builder::basic::make_document(
+        bsoncxx::builder::basic::kvp("promo", promo)
     );
+    std::vector<int64_t> users = mongo::GetAllInt("promo_users", filter, "user_id");
+    for (auto user : users) if (user_id == user) return false;
 
-    int64_t bonus_period = mongo::GetInt64(
-        "promo",
-        bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("promo", promo)),
-        "bonus_period"
-    );
+    int64_t uses = mongo::GetInt64("promo", filter, "uses" );
+    int64_t bonus_period = mongo::GetInt64("promo", filter, "bonus_period");
 
-    bool updated = mongo::UpdateField(
-        "promo",
-        bsoncxx::builder::basic::make_document(
-            bsoncxx::builder::basic::kvp("promo", promo)
-        ),
-        "uses",
+    bool updated = mongo::UpdateField("promo", filter, "uses",
         bsoncxx::types::b_int64{uses - 1}
     );
 
     if (!updated) return false;
+
+    if (!mongo::InsertIfNotExist(
+        "promo_users",
+        bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("promo", promo),
+            bsoncxx::builder::basic::kvp("user_id", user_id)
+        ),
+        bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("promo", promo),
+            bsoncxx::builder::basic::kvp("user_id", user_id)
+        )
+    )) return false;
 
     return service::keys::CreateVless(user_id, bonus_period);
 }

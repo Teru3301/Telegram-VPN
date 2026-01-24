@@ -1,7 +1,6 @@
 
 #include "services/keys.hpp"
 #include "xui/services.hpp"
-#include "mongo/user_calls.hpp"
 #include "mongo/core.hpp"
 
 
@@ -29,14 +28,6 @@ bool CreateVless(const int64_t user_id, const int64_t expiry_time)
             bsoncxx::builder::basic::kvp("email", key.email)
         )
     );
-}
-
-
-//  Ищет все ключи пользователя
-//  LEGACY
-std::vector<Key> FindAll(int64_t user_id)
-{
-    return mongo::FindAll(user_id);
 }
 
 

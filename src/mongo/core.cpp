@@ -228,6 +228,46 @@ int64_t GetInt64(
 }
 
 
+std::vector<int64_t> GetAllInt(
+    const std::string& document,
+    const bsoncxx::document::view& filter,
+    const std::string& field
+)
+{
+    std::vector<int64_t> result;
+
+    try
+    {
+        auto col = Database::instance().getDB()[document];
+        auto cursor = col.find(filter);
+
+        for (const auto& doc : cursor)
+        {
+            auto element = doc[field];
+            if (!element)
+                continue;
+
+            if (element.type() == bsoncxx::type::k_int64)
+            {
+                result.emplace_back(element.get_int64().value);
+            }
+            else if (element.type() == bsoncxx::type::k_int32)
+            {
+                result.emplace_back(
+                    static_cast<int64_t>(element.get_int32().value)
+                );
+            }
+        }
+    }
+    catch (...)
+    {
+        return {};
+    }
+
+    return result;
+}
+
+
 bool Delete(
     const std::string& document,
     const bsoncxx::document::view& filter
