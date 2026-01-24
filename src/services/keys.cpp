@@ -19,9 +19,16 @@ bool CreateVless(const int64_t user_id, const int64_t expiry_time)
     key.email = xui_client.email;
     key.vless_uri = xui_client.vless_uri;
 
-    mongo::AddVlessKey(key, user_id);
-
-    return key.active;
+    return mongo::InsertIfNotExist(
+        "vless_keys",
+        bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("email", key.email)
+        ),
+        bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("user_id", user_id),
+            bsoncxx::builder::basic::kvp("email", key.email)
+        )
+    );
 }
 
 
@@ -46,9 +53,7 @@ std::vector<Key> GetAll(int64_t user_id)
 
     std::vector<Key> keys;
     for (auto email : emails)
-    {
-        //  3x-ui
-    }
+        keys.push_back(xui::Service::GetVlessKey(email));
 
     return keys;
 }

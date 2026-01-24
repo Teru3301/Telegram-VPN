@@ -12,6 +12,8 @@
 
 int main()
 {
+    Log("------------------------------------------");
+
     const char* MONGO_URI = std::getenv("MONGO_URI");
     if (!MONGO_URI)
     {
@@ -32,8 +34,6 @@ int main()
     }
 
     Database::init(MONGO_URI, "test_db");
-
-
 
     if (!xui::Service::GetConnection()) return 1;
     AddTgAdmin();

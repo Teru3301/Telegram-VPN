@@ -5,6 +5,7 @@
 #include <chrono>
 #include <iomanip>
 #include <sstream>
+#include "models.hpp"
 
 
 namespace xui
@@ -91,10 +92,95 @@ bool EnableKey()
     return false;
 }
 
-bool GetTraffic()
+
+//  Возвращает vless ключ и данные о нём по email
+Key Service::GetVlessKey(const std::string& email)
 {
-    return false;
+    Key key{};
+    key.email = email;
+
+    if (!GetConnection())
+    {
+        Log("[3x-ui] no connection");
+        return key;
+    }
+
+    auto cfg = GetConfig();
+    if (cfg.inbound_id <= 0)
+    {
+        Log("[3x-ui] bad inbound id");
+        return key;
+    }
+
+    httplib::Client cli = utils::MakeClient(cfg);
+    httplib::Headers headers = {
+        {"Cookie", cfg.cookie}
+    };
+
+    auto res = cli.Get(
+        ("/panel/api/inbounds/get/" + std::to_string(cfg.inbound_id)).c_str(),
+        headers
+    );
+
+    if (!res || res->status != 200)
+    {
+        Log("[3x-ui] failed to get inbound");
+        return key;
+    }
+
+    auto j = nlohmann::json::parse(res->body);
+    if (!j.contains("success") || !j["success"])
+    {
+        Log("[3x-ui] inbound request failed");
+        return key;
+    }
+
+    auto inbound = j["obj"];
+    auto settings = nlohmann::json::parse(inbound["settings"].get<std::string>());
+    auto clients = settings["clients"];
+
+    for (auto& c : clients)
+    {
+        if (c["email"] != email)
+            continue;
+
+        key.active   = c.value("enable", false);
+        key.end_date = c.value("expiryTime", 0ULL);
+        key.u_gb     = c.value("up", 0ULL)   / 1024.0 / 1024.0 / 1024.0;
+        key.d_gb     = c.value("down", 0ULL) / 1024.0 / 1024.0 / 1024.0;
+
+        // Reality stream settings
+        auto stream = nlohmann::json::parse(
+            inbound["streamSettings"].get<std::string>()
+        );
+
+        auto reality = stream["realitySettings"];
+
+        std::string public_key = reality["publicKey"];
+        std::string short_id   = reality["shortIds"][0];
+        std::string sni        = reality["serverNames"][0];
+
+        std::string host = "127.0.0.1";
+        int port = inbound["port"];
+
+        key.vless_uri = utils::BuildVlessKey(
+            c["id"],
+            host,
+            port,
+            public_key,
+            short_id,
+            sni,
+            email
+        );
+        key.end_date /= 1000;
+
+        return key;
+    }
+
+    Log("[3x-ui] client not found: " + email);
+    return key;
 }
+
 
 }
 

@@ -11,7 +11,7 @@ MessageView Profile(int64_t user_id)
 {
     service::users::SetState(user_id, UserState::Idle);
     
-    std::vector<Key> keys = service::keys::FindAll(user_id);
+    std::vector<Key> keys = service::keys::GetAll(user_id);
     
     std::ostringstream text;
     text
@@ -25,8 +25,10 @@ MessageView Profile(int64_t user_id)
         std::tm tm{};
         localtime_r(&t, &tm);
         text 
+        << "🔑 Ключ: \n"
         << "<code>" << key.vless_uri << "</code>\n"
-        << "Дата окончания: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "\n"
+        << "⏳ Дата окончания: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "\n"
+        //<< (key.active ? "✅ активен" : "❌ не активен") << "\n"
         << "⬇️ Скачано: " << key.d_gb << "GB\n"
         << "⬆️ Отправлено: " << key.u_gb << "GB\n\n";
     }

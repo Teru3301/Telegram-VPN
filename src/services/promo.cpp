@@ -1,5 +1,6 @@
 
 #include "services/promo.hpp"
+#include "services/keys.hpp"
 #include "mongo/user_calls.hpp"
 #include "mongo/core.hpp"
 #include "xui/services.hpp"
@@ -64,15 +65,7 @@ bool Use(int64_t user_id, const std::string& promo)
 
     if (!updated) return false;
 
-    auto vless_client = xui::Service::CreateKey(bonus_period, user_id);
-
-    Key key;
-    key.end_date = vless_client.expiry_time;
-    key.vless_uri = vless_client.vless_uri;
-    key.email = vless_client.email;
-    key.active = vless_client.enabled;
-
-    return mongo::AddVlessKey(key, user_id);
+    return service::keys::CreateVless(user_id, bonus_period);
 }
 
 

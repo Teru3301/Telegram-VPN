@@ -4,6 +4,8 @@
 #include "xui/utils.hpp"
 
 
+class Key;  //  костыль (надеюсь временный)
+
 namespace xui 
 {
 
@@ -16,7 +18,7 @@ public:
     static Client CreateKey(uint64_t expiry_time, uint64_t tg_uid); //  Создаёт ключ для подключения
     static bool DisableKey();                                       //  Деактивирует ключ
     static bool EnableKey();                                        //  Активирует ключ
-    static bool GetTraffic();                                       //  Возвращает количество использованного трафика
+    static Key GetVlessKey(const std::string& email);               //  Возвращает vless ключ и данные о нём по email
 
 private:
     static bool TryFindConnection();                                //  Попытка найти 3x-ui соединение
