@@ -168,6 +168,37 @@ std::string GetString(
 }
 
 
+std::vector<std::string> GetAllString(
+    const std::string& document,
+    const bsoncxx::document::view& filter,
+    const std::string& field
+)
+{
+    std::vector<std::string> result;
+
+    try
+    {
+        auto col = Database::instance().getDB()[document];
+        auto cursor = col.find(filter);
+
+        for (const auto& doc : cursor)
+        {
+            auto element = doc[field];
+            if (!element || element.type() != bsoncxx::type::k_string)
+                continue;
+
+            result.emplace_back(element.get_string().value);
+        }
+    }
+    catch (...)
+    {
+        return {};
+    }
+
+    return result;
+}
+
+
 int64_t GetInt64(
     const std::string& document,
     const bsoncxx::document::view& filter,

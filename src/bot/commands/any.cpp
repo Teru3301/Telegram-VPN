@@ -2,6 +2,7 @@
 #include "bot/commands.hpp"
 #include "services/users.hpp"
 #include "services/promo.hpp"
+#include "bot/helper.hpp"
 
 
 MessageView OnIdle(TgBot::Message::Ptr msg)
@@ -193,12 +194,7 @@ public:
                 Log("Непредвиденный UserState");
                 view = OnError(msg);
         }
-        bot.getApi().sendMessage(
-            msg->chat->id,
-            view.text,
-            nullptr, nullptr,
-            view.keyboard
-        );
+        bot::helper::SendMessage(bot, msg, view);
     }
 };
 

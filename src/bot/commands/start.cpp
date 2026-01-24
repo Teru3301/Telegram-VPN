@@ -2,6 +2,7 @@
 #include <tgbot/tgbot.h>
 #include "bot/commands.hpp"
 #include "services/users.hpp"
+#include "bot/helper.hpp"
 
 
 MessageView Start(int64_t user_id)
@@ -52,22 +53,11 @@ public:
     void execute(TgBot::Bot& bot, TgBot::Message::Ptr msg) override {
         Log("[" + std::to_string(msg->from->id) + "] StartCommand");
         Log(msg);
-
         bool reg_ok = service::users::RegisterNew(msg->from->id, msg->from->username);
         Log(reg_ok ? "A new user has registered" : "The user was not registered");
-
         if (service::users::IsAdmin(msg->from->username)) service::users::SetAdmin(msg->from->id);
-        if (service::users::IsAdmin(msg->from->username)) Log("is admin by username");
-        if (service::users::IsAdmin(msg->from->id)) Log("is admin by id");
-
         auto view = Start(msg->from->id);
-
-        bot.getApi().sendMessage(
-            msg->chat->id,
-            view.text,
-            nullptr, nullptr,
-            view.keyboard
-        );
+        bot::helper::SendMessage(bot, msg, view);
     }
 };
 
@@ -79,38 +69,9 @@ public:
     }
 
     void execute(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query) override {
-        if (!query || !query->from || !query->message)
-            return;
-
         Log("[" + std::to_string(query->from->id) + "] StartCallback");
-
-        try 
-        {
-            bot.getApi().answerCallbackQuery(query->id);
-
-            auto view = Start(query->from->id);
-
-            bot.getApi().editMessageText(
-                view.text,
-                query->message->chat->id,
-                query->message->messageId,
-                "",
-                "HTML",
-                nullptr,
-                view.keyboard,
-                {}
-            );
-        } 
-        catch (...) 
-        {
-            Log("Кнопка устарела");
-            bot.getApi().sendMessage (
-                query->message->chat->id,
-                "Кнопка устарела. Используйте /start"
-            );
-        }
-
-
+        auto view = Start(query->from->id);
+        bot::helper::EditMessage(bot, query, view, "HTML");
         bool reg_ok = service::users::RegisterNew(query->from->id, query->from->username);
         Log(reg_ok ? "A new user has registered" : "The user was not registered");
     }

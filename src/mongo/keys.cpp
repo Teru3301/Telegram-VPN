@@ -39,6 +39,8 @@ bool AddVlessKey(const Key& key, const int64_t user_id)
 }
 
 
+// TODO
+// DELETE
 std::vector<Key> FindAll(const int64_t user_id)
 {
     std::vector<Key> keys;

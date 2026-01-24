@@ -1,8 +1,8 @@
 
 #include "bot/commands.hpp"
 #include <sstream>
-#include <iomanip>
 #include "services/users.hpp"
+#include "bot/helper.hpp"
 
 
 MessageView Buy(int64_t user_id)
@@ -35,15 +35,8 @@ public:
 
     void execute(TgBot::Bot& bot, TgBot::Message::Ptr msg) override {
         Log("[" + std::to_string(msg->from->id) + "] Buy command");
-
         auto view = Buy(msg->from->id);
-
-        bot.getApi().sendMessage(
-            msg->chat->id,
-            view.text,
-            nullptr, nullptr,
-            view.keyboard
-        );
+        bot::helper::SendMessage(bot, msg, view);
     }
 };
 
@@ -55,25 +48,9 @@ public:
     }
 
     void execute(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query) override {
-        if (!query || !query->from || !query->message)
-            return;
-
         Log("[" + std::to_string(query->from->id) + "] Buy callback");
-
         auto view = Buy(query->from->id);
-
-        bot.getApi().answerCallbackQuery(query->id);
-
-        bot.getApi().editMessageText(
-            view.text,
-            query->message->chat->id,
-            query->message->messageId,
-            "",
-            "",
-            nullptr,
-            view.keyboard,
-            {}
-        );
+        bot::helper::EditMessage(bot, query, view);
     }
 };
 

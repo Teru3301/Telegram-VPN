@@ -21,7 +21,7 @@ namespace mongo
 
 
 bool AddVlessKey(const Key& key, const int64_t user_id);
-std::vector<Key> FindAll(const int64_t user_id);
+std::vector<Key> FindAll(const int64_t user_id);        // DELETE
 Key Find(const std::string& email);
 
 

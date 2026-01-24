@@ -2,6 +2,7 @@
 #include "bot/commands.hpp"
 #include "services/users.hpp"
 #include "services/promo.hpp"
+#include "bot/helper.hpp"
 
 
 MessageView PromoEndDate(int64_t user_id)
@@ -37,16 +38,8 @@ public:
     void execute(TgBot::Bot& bot, TgBot::Message::Ptr msg) override {
         Log("[" + std::to_string(msg->from->id) + "] Create promo step-1 command");
         Log(msg);
-        
         auto view = PromoEndDate(msg->from->id);
-        
-        bot.getApi().sendMessage(
-            msg->chat->id,
-            view.text,
-            nullptr, nullptr,
-            view.keyboard,
-            "HTML"
-        );
+        bot::helper::SendMessage(bot, msg, view, "HTML");
     }
 };
 
@@ -58,36 +51,9 @@ public:
     }
 
     void execute(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query) override {
-        if (!query || !query->from || !query->message)
-            return;
-
         Log("[" + std::to_string(query->from->id) + "] Create promo step-1 callback");
-
-        try 
-        {
-            bot.getApi().answerCallbackQuery(query->id);
-
-            auto view = PromoEndDate(query->from->id);
-
-            bot.getApi().editMessageText(
-                view.text,
-                query->message->chat->id,
-                query->message->messageId,
-                "",
-                "HTML",
-                nullptr,
-                view.keyboard,
-                {}
-            );
-        } 
-        catch (...) 
-        {
-            Log("Кнопка устарела");
-            bot.getApi().sendMessage (
-                query->message->chat->id,
-                "Кнопка устарела. Используйте /create_promo"
-            );
-        }
+        auto view = PromoEndDate(query->from->id);
+        bot::helper::EditMessage(bot, query, view, "HTML");
     }
 };
 
@@ -122,11 +88,8 @@ public:
     }
 
     void execute(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query) override {
-        if (!query || !query->from || !query->message)
-            return;
-
+        if (!query || !query->from || !query->message) return;
         Log("[" + std::to_string(query->from->id) + "] Create promo step-2 callback");
-
         std::string data = query->data; 
         if (data.find(":") != std::string::npos)
         {
@@ -134,32 +97,8 @@ public:
             auto seconds = std::stoll(data.substr(data.find(":") + 1));
             service::promo::SetDraftEndDate(query->from->id, seconds);
         }
-
-        try 
-        {
-            bot.getApi().answerCallbackQuery(query->id);
-
-            auto view = PromoBonus(query->from->id);
-
-            bot.getApi().editMessageText(
-                view.text,
-                query->message->chat->id,
-                query->message->messageId,
-                "",
-                "HTML",
-                nullptr,
-                view.keyboard,
-                {}
-            );
-        } 
-        catch (...) 
-        {
-            Log("Кнопка устарела");
-            bot.getApi().sendMessage (
-                query->message->chat->id,
-                "Кнопка устарела. Используйте /create_promo"
-            );
-        }
+        auto view = PromoBonus(query->from->id);
+        bot::helper::EditMessage(bot, query, view);
     }
 };
 
@@ -189,11 +128,8 @@ public:
     }
 
     void execute(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query) override {
-        if (!query || !query->from || !query->message)
-            return;
-
+        if (!query || !query->from || !query->message) return;
         Log("[" + std::to_string(query->from->id) + "] Create promo step-3 callback");
-        
         std::string data = query->data; 
         if (data.find(":") != std::string::npos)
         {
@@ -201,32 +137,8 @@ public:
             auto seconds = std::stoll(data.substr(data.find(":") + 1));
             service::promo::SetDraftBonus(query->from->id, seconds);
         }
-
-        try 
-        {
-            bot.getApi().answerCallbackQuery(query->id);
-
-            auto view = PromoPromo(query->from->id);
-
-            bot.getApi().editMessageText(
-                view.text,
-                query->message->chat->id,
-                query->message->messageId,
-                "",
-                "HTML",
-                nullptr,
-                view.keyboard,
-                {}
-            );
-        } 
-        catch (...) 
-        {
-            Log("Кнопка устарела");
-            bot.getApi().sendMessage (
-                query->message->chat->id,
-                "Кнопка устарела. Используйте /create_promo"
-            );
-        }
+        auto view = PromoPromo(query->from->id);
+        bot::helper::EditMessage(bot, query, view);
     }
 };
 
@@ -262,36 +174,10 @@ public:
     }
 
     void execute(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query) override {
-        if (!query || !query->from || !query->message)
-            return;
-
+        if (!query || !query->from || !query->message) return;
         Log("[" + std::to_string(query->from->id) + "] Confirm create promo callback");
-
-        try 
-        {
-            bot.getApi().answerCallbackQuery(query->id);
-
-            auto view = ConfirmCreatePromo(query->from->id);
-
-            bot.getApi().editMessageText(
-                view.text,
-                query->message->chat->id,
-                query->message->messageId,
-                "",
-                "HTML",
-                nullptr,
-                view.keyboard,
-                {}
-            );
-        } 
-        catch (...) 
-        {
-            Log("Кнопка устарела");
-            bot.getApi().sendMessage (
-                query->message->chat->id,
-                "Кнопка устарела. Используйте /create_promo"
-            );
-        }
+        auto view = ConfirmCreatePromo(query->from->id);
+        bot::helper::EditMessage(bot, query, view);
     }
 };
 

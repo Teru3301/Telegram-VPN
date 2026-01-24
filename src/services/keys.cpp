@@ -26,9 +26,31 @@ bool CreateVless(const int64_t user_id, const int64_t expiry_time)
 
 
 //  Ищет все ключи пользователя
+//  LEGACY
 std::vector<Key> FindAll(int64_t user_id)
 {
     return mongo::FindAll(user_id);
+}
+
+
+//  Возвращает все ключи пользователя с заполненной информацией
+std::vector<Key> GetAll(int64_t user_id)
+{
+    std::vector<std::string> emails = mongo::GetAllString(
+        "vless_keys",
+        bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("user_id", user_id)
+        ),
+        "email"
+    );
+
+    std::vector<Key> keys;
+    for (auto email : emails)
+    {
+        //  3x-ui
+    }
+
+    return keys;
 }
 
 
@@ -36,20 +58,6 @@ std::vector<Key> FindAll(int64_t user_id)
 bool Find(const std::string& email)
 {
     return mongo::Exist("vless_keys", "email", email);
-}
-
-
-//  Собирает данные о ключе по названию
-Key Info(const std::string& email)
-{
-    Key key = mongo::Find(email);
-    
-    // TODO
-    // запросы к 3x-ui 
-    // - трафик
-    // - активен или нет
-
-    return key;
 }
 
 
