@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <fstream>
 #include "loger.hpp"
+#include <filesystem>
 
 
 std::string prefix()
@@ -38,6 +39,8 @@ void Logger::log_to_cmd(const std::string& log_message)
 
 void Logger::log_to_file(const std::string& log_message)
 {
+    std::filesystem::create_directories("data");
+
     std::ofstream file(this->log_file_path, std::ios::app);   
     if (file.is_open()) 
     {

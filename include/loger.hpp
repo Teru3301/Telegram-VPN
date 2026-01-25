@@ -33,7 +33,7 @@ private:
     std::string user_name;
     std::string message;
 
-    std::string log_file_path = "logs";
+    std::string log_file_path = "data/logs";
 
     void log();
     void log_to_cmd(const std::string& log_message);

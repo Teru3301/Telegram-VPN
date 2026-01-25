@@ -1,60 +1,38 @@
 
 #include "config.hpp" 
-#include <iostream>
-#include <cstdlib>
-#include "services/users.hpp"
+#include "loger.hpp"
 
 
-std::string GetToken()
+namespace config
 {
-    const char* env_token = std::getenv("TG_BOT_TOKEN");
-    if (env_token && std::string(env_token).length() > 0)
+
+
+//  Проверяет существование переменной окружения
+bool CheckEnv(const std::string& var)
+{
+    const char* VARIABLE = std::getenv(var.c_str());
+    if (!VARIABLE)
     {
-        return std::string(env_token);
+        Log("[config] [CheckEnv] " + var + " not set");
+        throw std::runtime_error("enviroment variable not set");
     }
-    return "";
+    Log("[config] [CheckEnv] " + var + " is exists");
+    return true; 
 }
 
 
-void AddTgAdmin()
+//  Возвращает значение переменной окружения по её имени
+std::string GetEnv(const std::string& var)
 {
-    while (true)
+    const char* VARIABLE = std::getenv(var.c_str());
+    if (!VARIABLE)
     {
-        std::cout << "Add a new Telegram administrator? (y/n): ";
-        std::string answer;
-        std::getline(std::cin, answer);
-
-        if (answer == "n" || answer == "N")
-        {
-            std::cout << "Administrator setup finished.\n";
-            break;
-        }
-
-        if (answer != "y" && answer != "Y")
-        {
-            std::cout << "Please enter 'y' or 'n'.\n";
-            continue;
-        }
-
-        std::cout << "Enter Telegram username (without @): ";
-        std::string username;
-        std::getline(std::cin, username);
-
-        if (username.empty())
-        {
-            std::cout << "Username cannot be empty.\n";
-            continue;
-        }
-
-        if (service::users::SetAdmin(username))
-        {
-            std::cout << "Administrator @" << username << " added successfully.\n";
-        }
-        else
-        {
-            std::cout << "Failed to add administrator @" << username
-                      << " (maybe already exists).\n";
-        }
+        Log("[config] [GetEnv] " + var + " not set");
+        throw std::runtime_error("enviroment variable not set");
     }
+    return VARIABLE;
+}
+
+
 }
 

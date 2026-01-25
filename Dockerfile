@@ -36,8 +36,8 @@ RUN git clone --depth 1 https://github.com/reo7sp/tgbot-cpp \
     && ninja -C tgbot-cpp/build install \
     && rm -rf /tmp/tgbot-cpp
 
-WORKDIR /app/Bot
-COPY Bot/ /app/Bot/
+WORKDIR /app/
+COPY / /app/
 
 RUN cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
     && ninja -C build \
@@ -61,7 +61,7 @@ ENV LD_LIBRARY_PATH=/usr/local/lib
 
 WORKDIR /app
 
-COPY --from=builder /app/Bot/build/bot /app/bot
+COPY --from=builder /app/build/bot /app/bot
 
 CMD ["/app/bot"]
 

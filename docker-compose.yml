@@ -17,6 +17,8 @@ services:
       TG_BOT_TOKEN: ${TG_BOT_TOKEN}
       MONGO_URI: ${MONGO_URI}
       XUI_URL: ${XUI_URL}
+    volumes:
+      - ./data:/app/data
     restart: unless-stopped
 
 volumes:

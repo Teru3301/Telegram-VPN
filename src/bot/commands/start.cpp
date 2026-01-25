@@ -5,7 +5,7 @@
 #include "bot/helper.hpp"
 
 
-MessageView Start(int64_t user_id)
+MessageView Start(int64_t user_id, const std::string& user_tag)
 {
     service::users::SetState(user_id, UserState::Idle);
     
@@ -30,7 +30,7 @@ MessageView Start(int64_t user_id)
 
     keyboard->inlineKeyboard.push_back(row);
 
-    if (service::users::IsAdmin(user_id))
+    if (service::users::IsAdmin(user_tag, user_id))
     {
         text 
         << "\n\nВы назначены администратором этого бота";
@@ -55,8 +55,7 @@ public:
         Log(msg);
         bool reg_ok = service::users::RegisterNew(msg->from->id, msg->from->username);
         Log(reg_ok ? "A new user has registered" : "The user was not registered");
-        if (service::users::IsAdmin(msg->from->username)) service::users::SetAdmin(msg->from->id);
-        auto view = Start(msg->from->id);
+        auto view = Start(msg->from->id, msg->from->username);
         bot::helper::SendMessage(bot, msg, view);
     }
 };
@@ -70,7 +69,7 @@ public:
 
     void execute(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query) override {
         Log("[" + std::to_string(query->from->id) + "] StartCallback");
-        auto view = Start(query->from->id);
+        auto view = Start(query->from->id, query->from->username);
         bot::helper::EditMessage(bot, query, view, "HTML");
         bool reg_ok = service::users::RegisterNew(query->from->id, query->from->username);
         Log(reg_ok ? "A new user has registered" : "The user was not registered");

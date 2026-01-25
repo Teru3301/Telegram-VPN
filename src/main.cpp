@@ -6,38 +6,23 @@
 #include "bot/commands.hpp"
 #include "xui/services.hpp"
 #include "loger.hpp"
-#include <cstdlib>
 #include "mongo/mongo.hpp"
+#include "bot/config.hpp"
 
 
 int main()
 {
     Log("------------------------------------------");
 
-    const char* MONGO_URI = std::getenv("MONGO_URI");
-    if (!MONGO_URI)
-    {
-        Log("MONGO_URI not set");
-        throw std::runtime_error("MONGO_URI not set");
-    }
-    const char* TG_BOT_TOKEN = std::getenv("TG_BOT_TOKEN");
-    if (!TG_BOT_TOKEN)
-    {
-        Log("TG_BOT_TOKEN not set");
-        throw std::runtime_error("TG_BOT_TOKEN not set");
-    }
-    const char* XUI_URL = std::getenv("XUI_URL");
-    if (!XUI_URL)
-    {
-        Log("XUI_URL not set");
-        throw std::runtime_error("XUI_URL not set");
-    }
+    config::CheckEnv("MONGO_URI");
+    config::CheckEnv("TG_BOT_TOKEN");
+    config::CheckEnv("XUI_URL");
 
-    Database::init(MONGO_URI, "test_db");
+    Database::init(config::GetEnv("MONGO_URI"), "test_db");
 
     if (!xui::Service::GetConnection()) return 1;
-    AddTgAdmin();
-    TgBot::Bot bot{GetToken()};
+    TgBot::Bot bot{config::GetEnv("TG_BOT_TOKEN")};
+    bot::config::LoadAdmins("data/admins.json");
 
     CommandDispatcher cmd_dispatcher;
     CallbackDispatcher cal_dispatcher;
