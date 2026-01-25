@@ -11,7 +11,7 @@ MessageView Profile(int64_t user_id)
 {
     service::users::SetState(user_id, UserState::Idle);
     
-    std::vector<Key> keys = service::keys::GetAll(user_id);
+    std::vector<models::Key> keys = service::keys::GetAll(user_id);
     
     std::ostringstream text;
     text

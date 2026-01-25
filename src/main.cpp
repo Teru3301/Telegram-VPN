@@ -4,10 +4,10 @@
 #include "config.hpp"
 #include "bot/dispatcher.hpp"
 #include "bot/commands.hpp"
-#include "xui/services.hpp"
 #include "loger.hpp"
 #include "mongo/mongo.hpp"
 #include "bot/config.hpp"
+#include "xui/config.hpp"
 
 
 int main()
@@ -17,10 +17,11 @@ int main()
     config::CheckEnv("MONGO_URI");
     config::CheckEnv("TG_BOT_TOKEN");
     config::CheckEnv("XUI_URL");
+    config::CheckEnv("IP");
 
     Database::init(config::GetEnv("MONGO_URI"), "test_db");
 
-    if (!xui::Service::GetConnection()) return 1;
+    if (!xui::config::GetConnection()) return 1;
     TgBot::Bot bot{config::GetEnv("TG_BOT_TOKEN")};
     bot::config::LoadAdmins("data/admins.json");
 

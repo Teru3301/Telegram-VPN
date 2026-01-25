@@ -1,27 +1,28 @@
 
-#include "xui/services.hpp"
-#include "nlohmann/json.hpp"
-#include "loger.hpp"
-#include <chrono>
-#include <iomanip>
-#include <sstream>
+#include "xui/keys.hpp"
+#include "xui/utils.hpp"
+#include "xui/config.hpp"
 #include "models.hpp"
+#include "loger.hpp"
+#include "nlohmann/json.hpp"
 
 
-namespace xui
+namespace xui::keys
 {
 
-Client Service::CreateKey(uint64_t expiry_time, uint64_t tg_uid)
+
+//  Создаёт ключ для подключения
+models::Client CreateKey(int64_t expiry_time, int64_t tg_uid)
 {
-    Client vless_client = utils::GetClient("");
+    models::Client vless_client = xui::utils::GetClient("");
     
-    if (!GetConnection())
+    if (!xui::config::GetConnection())
     {
         Log("[3x-ui] no connection");
         return vless_client;
     }
 
-    auto cfg = GetConfig();
+    auto cfg = xui::config::GetXuiClient();
     if (cfg.inbound_id <= 0)
     {
         Log("[3x-ui] bad inbound id");
@@ -82,11 +83,14 @@ Client Service::CreateKey(uint64_t expiry_time, uint64_t tg_uid)
 }
 
 
+//  Деактивирует ключ
 bool DisableKey()
 {
     return false;
 }
 
+
+//  Активирует ключ
 bool EnableKey()
 {
     return false;
@@ -94,18 +98,18 @@ bool EnableKey()
 
 
 //  Возвращает vless ключ и данные о нём по email
-Key Service::GetVlessKey(const std::string& email)
+models::Key GetVlessKey(const std::string& email)
 {
-    Key key{};
+    models::Key key{};
     key.email = email;
 
-    if (!GetConnection())
+    if (!xui::config::GetConnection())
     {
         Log("[3x-ui] no connection");
         return key;
     }
 
-    auto cfg = GetConfig();
+    auto cfg = xui::config::GetXuiClient();
     if (cfg.inbound_id <= 0)
     {
         Log("[3x-ui] bad inbound id");
@@ -182,5 +186,8 @@ Key Service::GetVlessKey(const std::string& email)
 }
 
 
+
 }
+
+
 
