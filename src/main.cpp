@@ -16,8 +16,10 @@ int main()
 
     config::CheckEnv("MONGO_URI");
     config::CheckEnv("TG_BOT_TOKEN");
-    config::CheckEnv("XUI_URL");
     config::CheckEnv("IP");
+    config::CheckEnv("XUI_URL");
+    config::CheckEnv("XUI_LOGIN");
+    config::CheckEnv("XUI_PASSWORD");
 
     Database::init(config::GetEnv("MONGO_URI"), "test_db");
 

@@ -2,6 +2,7 @@
 #include "mongo/core.hpp"
 #include "mongo/mongo.hpp"
 #include <mongocxx/collection.hpp>
+#include <mongocxx/exception/exception.hpp>
 
 
 namespace mongo
@@ -161,10 +162,19 @@ std::string GetString(
 
         return std::string(element.get_string().value);
     }
+    catch (const mongocxx::exception& e)
+    {
+        return "MongoDB error: " + std::string(e.what());
+    }
+    catch (const std::exception& e)
+    {
+        return "Exception: " + std::string(e.what());
+    }
     catch (...)
     {
         return {};
     }
+    return {};
 }
 
 

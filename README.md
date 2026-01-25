@@ -78,6 +78,10 @@ docker compose restart bot
 
 `IP` - ip-адрес вашего сервера
 
+`XUI_LOGIN` - логин для входа в веб панель 3x-ui
+
+`XUI_PASSWORD` - пароль для входа в веб панель 3x-ui
+
 ---
 
 ## Ручная сборка и запуск
@@ -94,6 +98,8 @@ TG_BOT_TOKEN=your_telegram_bot_token
 MONGO_URI=mongodb://mongo:27017
 XUI_URL=127.0.0.1:2053
 IP=127.0.0.1
+XUI_LOGIN=admin
+XUI_PASSWORD=admin
 ```
 
 В корне репозитория выполните:
@@ -129,6 +135,8 @@ export TG_BOT_TOKEN="12345:your_telegram_bot_token"
 export MONGO_URI="mongodb://127.0.0.1:27017"
 export XUI_URL="127.0.0.1:2053"
 export IP="127.0.0.1"
+export XUI_LOGIN=admin
+export XUI_PASSWORD=admin
 # запустите бота
 ./bot
 ```

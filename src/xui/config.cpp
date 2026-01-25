@@ -21,8 +21,8 @@ const models::XuiClient& GetXuiClient()
     {
         xui_client.base_url = ::config::GetEnv("XUI_URL");
         xui_client.timeout  = 5;
-        xui_client.login    = "admin";
-        xui_client.password = "admin";
+        xui_client.login    = ::config::GetEnv("XUI_LOGIN");
+        xui_client.password = ::config::GetEnv("XUI_PASSWORD");
 
         Log("[3x-ui] init URL=" + xui_client.base_url);
         initialized = true;

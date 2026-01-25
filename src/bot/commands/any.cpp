@@ -162,7 +162,6 @@ public:
     }
 
     void execute(TgBot::Bot& bot, TgBot::Message::Ptr msg) override {
-        
         UserState state = service::users::GetState(msg->from->id);
         Log("[" + std::to_string(msg->from->id) + "] Any message");
         Log(msg);
