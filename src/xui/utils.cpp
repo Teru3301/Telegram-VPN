@@ -237,14 +237,20 @@ bool TryFindConnection()
 
     auto res = cli.Get("/panel/api/inbounds/list", headers);
     if (!res || res->status != 200)
+    {
+        Log("[3x-ui] [TryFindConnection] Error. http status is missing or not 200");
         return false;
+    }
 
     try
     {
         auto j = nlohmann::json::parse(res->body);
 
         if (!j.contains("success") || !j["success"])
+        {
+            Log("[3x-ui] [TryFindConnection] Error. ...");
             return false;
+        }
 
         for (const auto& inbound : j["obj"])
         {
@@ -253,16 +259,19 @@ bool TryFindConnection()
                 inbound["remark"] == "bot")
             {
                 xui::config::SetInboundId(inbound["id"].get<int>());
+                Log("[3x-ui] [TryFindConnection] Success");
                 return true;
             }
         }
     }
     catch (...)
     {
+        Log("[3x-ui] [TryFindConnection] An exception was thrown");
         return false;
     }
 
     xui::config::SetInboundId(-1);
+    Log("[3x-ui] [TryFindConnection] Some error");
     return false;
 }
 
@@ -270,41 +279,79 @@ bool TryFindConnection()
 bool CreateConnection(const models::RealityCert& cert)
 {
     auto cfg = xui::config::GetXuiClient();
-    httplib::Client cli = MakeClient(cfg);
+    httplib::Client cli = xui::utils::MakeClient(cfg);
 
-    httplib::Headers headers =
+    httplib::Headers headers = 
     {
-        { "Cookie", cfg.cookie },
-        { "Content-Type", "application/json" }
+        {"Cookie", cfg.cookie},
+        {"Content-Type", "application/json"}
     };
 
-    nlohmann::json payload =
+    nlohmann::json settings_json = 
     {
-        { "remark", "bot" },
-        { "port", 443 },
-        { "protocol", "vless" },
-        { "enable", true }
+        {"clients", nlohmann::json::array()},
+        {"decryption", "none"}
     };
 
-    auto res = cli.Post(
-        "/panel/api/inbounds/add",
-        headers,
-        payload.dump(),
-        "application/json"
-    );
+    nlohmann::json stream_settings_json = 
+    {
+        {"network","tcp"},
+        {"security","reality"},
+        {"realitySettings", 
+        {
+            {"show", false},
+            {"dest", "www.google.com:443"},
+            {"xver", 0},
+            {"serverNames", nlohmann::json::array({"www.google.com"})},
+            {"privateKey", cert.private_key},
+            {"publicKey", cert.public_key},
+            {"shortIds", cert.short_ids},
+            {"settings", { {"publicKey", cert.public_key}, {"spiderX","/"} }}
+        }}
+    };
+
+    nlohmann::json sniffing_json = 
+    {
+        {"enabled", true},
+        {"destOverride", nlohmann::json::array({"http","tls"})}
+    };
+
+    nlohmann::json payload = 
+    {
+        {"remark","bot"},
+        {"port",443},
+        {"protocol","vless"},
+        {"settings", settings_json.dump()},
+        {"streamSettings", stream_settings_json.dump()},
+        {"sniffing", sniffing_json.dump()},
+        {"enable", true}
+    };
+
+    auto res = cli.Post("/panel/api/inbounds/add", headers, payload.dump(), "application/json");
 
     if (!res || res->status != 200)
+    {
+        Log("[3x-ui] CreateConnection failed");
         return false;
+    }
 
     try
     {
         auto j = nlohmann::json::parse(res->body);
-        return j.contains("success") && j["success"];
+        if (!j.contains("success") || !j["success"])
+        {
+            Log("[3x-ui] CreateConnection failed: " + res->body);
+            return false;
+        }
     }
-    catch (...)
+    catch (const std::exception& e)
     {
+        Log("[3x-ui] CreateConnection JSON error: " + std::string(e.what()));
         return false;
     }
+
+    Log("[3x-ui] Connection created successfully");
+    return true;
 }
 
 

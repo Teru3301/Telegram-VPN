@@ -19,6 +19,8 @@ const models::XuiClient& GetXuiClient()
 
     if (!initialized)
     {
+        Log("[3x-ui] Init singleton");
+
         xui_client.base_url = ::config::GetEnv("XUI_URL");
         xui_client.timeout  = 5;
         xui_client.login    = ::config::GetEnv("XUI_LOGIN");
@@ -114,16 +116,23 @@ bool Login()
 
 bool GetConnection()
 {
-    if (!IsAlive())
-        return false;
+    if (!IsAlive()) return false;
+    if (!Login())   return false;
 
-    if (!Login())
-        return false;
+    bool connection_found = utils::TryFindConnection();
 
-    if (!utils::TryFindConnection())
+    if (!connection_found)
+    {
         utils::CreateConnection(utils::GenerateRealityCert());
+        connection_found = utils::TryFindConnection();
+    }
 
-    return utils::TryFindConnection();
+    if (connection_found)
+        Log("[3x-ui] [GetConnection] The connection was successfully found");
+    else 
+        Log("[3x-ui] [GetConnection] Unable to find connection");
+
+    return connection_found;
 }
 
 

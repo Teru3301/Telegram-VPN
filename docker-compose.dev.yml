@@ -1,16 +1,16 @@
 services:
   mongo:
+    network_mode: host
     image: mongo:7.0
     container_name: mongodb
-    network_mode: host
     volumes:
       - mongo_data:/data/db
     restart: unless-stopped
 
   bot:
-    image: ghcr.io/teru3301/telegram-vpn:latest
-    container_name: telegram-vpn-bot
     network_mode: host
+    build: .
+    container_name: telegram-vpn-bot
     depends_on:
       - mongo
     environment:

@@ -5,6 +5,7 @@
 #include "models.hpp"
 #include "loger.hpp"
 #include "nlohmann/json.hpp"
+#include "config.hpp"
 
 
 namespace xui::keys
@@ -69,7 +70,16 @@ models::Client CreateKey(int64_t expiry_time, int64_t tg_uid)
         return vless_client;
     }
 
-    auto j = nlohmann::json::parse(res->body);
+    //auto j = nlohmann::json::parse(res->body);
+    nlohmann::json j;
+    try {
+        j = nlohmann::json::parse(res->body);
+    } catch (const std::exception& e) {
+        Log(std::string("[3x-ui] json parse error: ") + e.what());
+        Log("[3x-ui] raw body: '" + res->body + "'");
+        return {};
+    }
+
     if (!j.contains("success") || !j["success"])
     {
         Log("[3x-ui] add client failed");
@@ -132,7 +142,19 @@ models::Key GetVlessKey(const std::string& email)
         return key;
     }
 
-    auto j = nlohmann::json::parse(res->body);
+    //auto j = nlohmann::json::parse(res->body);
+
+    nlohmann::json j;
+    try {
+        j = nlohmann::json::parse(res->body);
+    } catch (const std::exception& e) {
+        Log(std::string("[3x-ui] json parse error: ") + e.what());
+        Log("[3x-ui] raw body: '" + res->body + "'");
+        return {};
+    }
+
+
+
     if (!j.contains("success") || !j["success"])
     {
         Log("[3x-ui] inbound request failed");
@@ -164,7 +186,7 @@ models::Key GetVlessKey(const std::string& email)
         std::string short_id   = reality["shortIds"][0];
         std::string sni        = reality["serverNames"][0];
 
-        std::string host = "127.0.0.1";
+        std::string host = ::config::GetEnv("IP");
         int port = inbound["port"];
 
         key.vless_uri = utils::BuildVlessKey(
