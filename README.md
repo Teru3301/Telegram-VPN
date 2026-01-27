@@ -84,65 +84,6 @@ docker compose restart bot
 
 ---
 
-## Ручная сборка и запуск
-
-### Запуск с помошью Docker
-
-Убедитесь что увас установлены и активны:
-- docker
-- docker-compose
-
-Убедитесь, что файл .env содержит переменные окружения с корректными значениями:
-```
-TG_BOT_TOKEN=your_telegram_bot_token
-MONGO_URI=mongodb://mongo:27017
-XUI_URL=127.0.0.1:2053
-IP=127.0.0.1
-XUI_LOGIN=admin
-XUI_PASSWORD=admin
-```
-
-В корне репозитория выполните:
-```bash
-docker compose up -d
-```
-Контейнеры будут автоматически созданы и запущены в фоновом режиме
-
-### Сборка бинарного файла
-
-Убедитесь что увас установлены:
-- cmake
-- ninja
-- Компилятор C++ (gcc/clang)
-- mongo-c-driver
-- mongo-cxx-driver 4.0.0
-- libtgbot-cpp
-- MongoDB
-- 3X-UI
-
-```bash
-mkdir -p Bot/buld
-cd Bot/build
-cmake ..
-cmake --build .
-```
-
-запуск бинарника
-
-```bash
-# экспортируйте переменные окружения с вашими значениями
-export TG_BOT_TOKEN="12345:your_telegram_bot_token"
-export MONGO_URI="mongodb://127.0.0.1:27017"
-export XUI_URL="127.0.0.1:2053"
-export IP="127.0.0.1"
-export XUI_LOGIN=admin
-export XUI_PASSWORD=admin
-# запустите бота
-./bot
-```
-
----
-
 ## Поддержка проекта
 
 **Если этот проект полезен для вас, вы можете поставить ему** :star:
@@ -166,8 +107,13 @@ export XUI_PASSWORD=admin
 - [ ] Интеграция с платёжной системой
 - [x] Система промокодов
 
+### Others
+- [ ] Мануалы по использованию бота на разных платформах
+- [ ] Отдельные скрипты для установики контейнетов и настройки сервера
+
 ---
 
 > [!WARNING]
 > Проект в активной разработке. API и функционал могут изменяться.
+
 
