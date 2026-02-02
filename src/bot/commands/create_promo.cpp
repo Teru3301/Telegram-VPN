@@ -37,7 +37,6 @@ public:
 
     void execute(TgBot::Bot& bot, TgBot::Message::Ptr msg) override {
         Log("[" + std::to_string(msg->from->id) + "] Create promo step-1 command");
-        Log(msg);
         auto view = PromoEndDate(msg->from->id);
         bot::helper::SendMessage(bot, msg, view, "HTML");
     }

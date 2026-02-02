@@ -37,7 +37,6 @@ public:
 
     void execute(TgBot::Bot& bot, TgBot::Message::Ptr msg) override {
         Log("[" + std::to_string(msg->from->id) + "] Help command");
-        Log(msg);
         auto view = Help(msg->from->id);
         bot::helper::SendMessage(bot, msg, view, "HTML");
     }

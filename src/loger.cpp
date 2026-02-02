@@ -63,10 +63,11 @@ void Log(std::string message)
 {
     Logger l = Logger(message);
 }
+/*
 void Log(TgBot::Message::Ptr message)
 {
     Logger l = Logger(message);
 }
-
+*/
 
 

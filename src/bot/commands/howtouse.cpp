@@ -35,7 +35,6 @@ public:
 
     void execute(TgBot::Bot& bot, TgBot::Message::Ptr msg) override {
         Log("[" + std::to_string(msg->from->id) + "] HowToUseCommand");
-        Log(msg);
         auto view = HowToUse(msg->from->id);
         bot::helper::SendMessage(bot, msg, view, "HTML");
     }

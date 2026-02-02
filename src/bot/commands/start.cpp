@@ -52,7 +52,6 @@ public:
 
     void execute(TgBot::Bot& bot, TgBot::Message::Ptr msg) override {
         Log("[" + std::to_string(msg->from->id) + "] StartCommand");
-        Log(msg);
         bool reg_ok = service::users::RegisterNew(msg->from->id, msg->from->username);
         Log(reg_ok ? "A new user has registered" : "The user was not registered");
         auto view = Start(msg->from->id, msg->from->username);

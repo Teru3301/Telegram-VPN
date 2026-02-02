@@ -57,7 +57,7 @@ bool LoadAdmins(const std::string& path)
         if (!out.good()) return false;
 
         out << def.dump(4);
-        Log("[bot] created new admins config");
+        Log("[bot] [config] created new admins config");
 
         return true;
     }
@@ -88,18 +88,18 @@ bool LoadAdmins(const std::string& path)
     }
     catch (const std::exception& e)
     {
-        Log(std::string("[bot] admin config parse error: ") + e.what());
+        Log(std::string("[bot] [config] admin config parse error: ") + e.what());
         return false;
     }
 
     if (rule == Rule::Or) Log("[bot] is admin rule: or");
-    else Log("[bot] is admin rule: and");
+    else Log("[bot] [config] is admin rule: and");
 
-    Log("[bot] admins:");
+    Log("[bot] [config] admins:");
     if (admins.empty())
-        Log("[bot] admins not set");
+        Log("[bot] [config] admins not set");
     for (const auto& admin : admins)
-        Log("[bot] - @" + admin.user_tag + " [" + std::to_string(admin.user_id) + "]");
+        Log("[bot] [config] - @" + admin.user_tag + " [" + std::to_string(admin.user_id) + "]");
 
     return true;
 }
@@ -117,7 +117,7 @@ bool IsAdmin(const std::string& user_tag, int64_t user_id)
         {
             if (tag_match || id_match)
             {
-                Log("[bot] [IsAdmin] user @" + user_tag + " [" + std::to_string(user_id) + "] is admin");
+                Log("[bot] [config] [IsAdmin] user @" + user_tag + " [" + std::to_string(user_id) + "] is admin");
                 return true;
             }
         }
@@ -125,13 +125,13 @@ bool IsAdmin(const std::string& user_tag, int64_t user_id)
         {
             if (tag_match && id_match)
             {
-                Log("[bot] [IsAdmin] user @" + user_tag + " [" + std::to_string(user_id) + "] is admin");
+                Log("[bot] [config] [IsAdmin] user @" + user_tag + " [" + std::to_string(user_id) + "] is admin");
                 return true;
             }
         }
     }
 
-    Log("[bot] [IsAdmin] user @" + user_tag + " [" + std::to_string(user_id) + "] is not admin");
+    Log("[bot] [config] [IsAdmin] user @" + user_tag + " [" + std::to_string(user_id) + "] is not admin");
 
     return false;
 }

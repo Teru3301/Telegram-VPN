@@ -18,6 +18,7 @@ public:
         this->date_time = prefix();
         log();
     }
+    /*
     Logger(TgBot::Message::Ptr message)
     {
         this->message = message->text;
@@ -27,6 +28,7 @@ public:
         this->date_time = prefix();
         log();
     }
+    */
 private:
     std::string date_time;
     int user_id;

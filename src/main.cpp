@@ -54,7 +54,7 @@ int main()
 
     try 
     {
-        Log("Bot username: " + bot.getApi().getMe()->username);
+        Log("[main] Bot username: " + bot.getApi().getMe()->username);
         TgBot::TgLongPoll longPoll{bot};
         while (true)
         {
@@ -63,9 +63,9 @@ int main()
     } 
     catch (TgBot::TgException& e) 
     {
-        Log("Error:" + std::string(e.what()));
+        Log("[main] Error:" + std::string(e.what()));
     }
-    
+
     return 0;
 }
 
