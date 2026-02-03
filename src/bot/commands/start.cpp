@@ -51,9 +51,8 @@ public:
     }
 
     void execute(TgBot::Bot& bot, TgBot::Message::Ptr msg) override {
-        Log("[" + std::to_string(msg->from->id) + "] StartCommand");
+        Log("[bot] [command] [start] [" + std::to_string(msg->from->id));
         bool reg_ok = service::users::RegisterNew(msg->from->id, msg->from->username);
-        Log(reg_ok ? "A new user has registered" : "The user was not registered");
         auto view = Start(msg->from->id, msg->from->username);
         bot::helper::SendMessage(bot, msg, view);
     }
@@ -67,11 +66,10 @@ public:
     }
 
     void execute(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query) override {
-        Log("[" + std::to_string(query->from->id) + "] StartCallback");
+        Log("[bot] [callback] [start] [" + std::to_string(query->from->id));
         auto view = Start(query->from->id, query->from->username);
         bot::helper::EditMessage(bot, query, view, "HTML");
         bool reg_ok = service::users::RegisterNew(query->from->id, query->from->username);
-        Log(reg_ok ? "A new user has registered" : "The user was not registered");
     }
 };
 

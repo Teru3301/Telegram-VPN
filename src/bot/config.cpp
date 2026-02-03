@@ -92,7 +92,7 @@ bool LoadAdmins(const std::string& path)
         return false;
     }
 
-    if (rule == Rule::Or) Log("[bot] is admin rule: or");
+    if (rule == Rule::Or) Log("[bot] [config] is admin rule: or");
     else Log("[bot] [config] is admin rule: and");
 
     Log("[bot] [config] admins:");

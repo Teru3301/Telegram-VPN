@@ -30,7 +30,7 @@ bool CheckRegistration(const int64_t user_id)
 bool RegisterNew(const int64_t user_id, const std::string& user_tag)
 {
     Log("[service] [users] [RegisterNew] [TRY]   [" + std::to_string(user_id) +
-        "] tag=" + user_tag);
+        "] " + user_tag);
 
     bool res = mongo::InsertIfNotExist(
         "tg_users",
@@ -56,8 +56,8 @@ bool RegisterNew(const int64_t user_id, const std::string& user_tag)
 // Возвращает текущее состояние бота для пользователя
 UserState GetState(const int64_t user_id)
 {
-    Log("[service] [users] [GetState] [TRY]   [" + std::to_string(user_id) +
-        "] get state");
+    //Log("[service] [users] [GetState] [TRY]   [" + std::to_string(user_id) +
+    //    "] get state");
 
     std::string state = mongo::GetString(
         "tg_users",
@@ -69,13 +69,13 @@ UserState GetState(const int64_t user_id)
 
     if (state.empty())
     {
-        Log("[service] [users] [GetState] [FAIL]  [" + std::to_string(user_id) +
-            "] state not found, fallback Idle");
+    //    Log("[service] [users] [GetState] [FAIL]  [" + std::to_string(user_id) +
+    //        "] state not found, fallback Idle");
         return UserState::Idle;
     }
 
-    Log("[service] [users] [GetState] [OK]    [" + std::to_string(user_id) +
-        "] state=" + state);
+    //Log("[service] [users] [GetState] [OK]    [" + std::to_string(user_id) +
+    //    "] state=" + state);
 
     return StringToState(state);
 }
@@ -86,8 +86,8 @@ bool SetState(const int64_t user_id, const UserState& state)
 {
     const std::string state_str = StateToString(state);
 
-    Log("[service] [users] [SetState] [TRY]   [" + std::to_string(user_id) +
-        "] new_state=" + state_str);
+    //Log("[service] [users] [SetState] [TRY]   [" + std::to_string(user_id) +
+    //    "] new_state=" + state_str);
 
     bool res = mongo::UpdateField(
         "tg_users",
@@ -98,9 +98,9 @@ bool SetState(const int64_t user_id, const UserState& state)
         bsoncxx::types::b_string{state_str}
     );
 
-    Log("[service] [users] [SetState] [" +
-        std::string(res ? "OK]    " : "FAIL]  ") +
-        "[" + std::to_string(user_id) + "] state update");
+    //Log("[service] [users] [SetState] [" +
+    //    std::string(res ? "OK]    " : "FAIL]  ") +
+    //    "[" + std::to_string(user_id) + "] state update");
 
     return res;
 }
@@ -110,7 +110,7 @@ bool SetState(const int64_t user_id, const UserState& state)
 bool IsAdmin(const std::string& user_tag, int64_t user_id)
 {
     Log("[service] [users] [IsAdmin] [TRY]   [" + std::to_string(user_id) +
-        "] tag=" + user_tag);
+        "] " + user_tag);
 
     bool res = bot::config::IsAdmin(user_tag, user_id);
 

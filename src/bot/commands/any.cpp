@@ -3,6 +3,7 @@
 #include "services/users.hpp"
 #include "services/promo.hpp"
 #include "bot/helper.hpp"
+#include "mongo/core.hpp"
 
 
 MessageView OnIdle(TgBot::Message::Ptr msg)
@@ -126,7 +127,37 @@ MessageView OnEnterPromocode(TgBot::Message::Ptr msg)
     if (!service::promo::Check(promo))
     {
         service::promo::SetDraftPromo(msg->from->id, promo);
-        text << "Подтвердите создание промокода";
+
+        double expires_at = mongo::GetInt64(
+            "promo_drafts",
+            bsoncxx::builder::basic::make_document(
+                bsoncxx::builder::basic::kvp("user_id", msg->from->id)
+            ),
+            "promo_period"
+        );
+
+        double bonus_period = mongo::GetInt64(
+            "promo_drafts",
+            bsoncxx::builder::basic::make_document(
+                bsoncxx::builder::basic::kvp("user_id", msg->from->id)
+            ),
+            "bonus_period"
+        );
+
+        int64_t uses = mongo::GetInt64(
+            "promo_drafts",
+            bsoncxx::builder::basic::make_document(
+                bsoncxx::builder::basic::kvp("user_id", msg->from->id)
+            ),
+            "uses"
+        );
+
+        text << "Подтвердите создание промокода\n"
+            << "Промокод: <code>" << promo << "</code>\n"
+            << "Количество использований: <code>" << uses << "</code>\n"
+            << "Промокод будет действовать <code>" << expires_at / 1000 / 60 / 60 / 24 << "</code> дней после создания\n"
+            << "После ипользования код будет активен <code>" << bonus_period / 1000 / 60 / 60 / 24 << "</code> дней";
+
         service::users::SetState(msg->from->id, UserState::Idle);
         keyboard->inlineKeyboard.push_back({MakeButton("Создать", "confirm_create_promo")});
 
@@ -176,7 +207,8 @@ public:
 
     void execute(TgBot::Bot& bot, TgBot::Message::Ptr msg) override {
         UserState state = service::users::GetState(msg->from->id);
-        Log("[" + std::to_string(msg->from->id) + "] Any message");
+        Log("[bot] [AnyCommand] [" + std::to_string(msg->from->id) + 
+            "] message: " + msg->text);
 
         MessageView view;
         switch (state)
@@ -200,7 +232,7 @@ public:
             default:
                 view = OnError(msg);
         }
-        bot::helper::SendMessage(bot, msg, view);
+        bot::helper::SendMessage(bot, msg, view, "HTML");
     }
 };
 

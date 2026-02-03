@@ -7,6 +7,9 @@
 
 MessageView PromoEndDate(int64_t user_id)
 {
+    Log("[bot] [promo] [" + std::to_string(user_id) + 
+        "] choosing the promo code's validity period");
+
     service::users::SetState(user_id, UserState::Idle);
    
     service::promo::CreateDraft(user_id);
@@ -36,7 +39,6 @@ public:
     }
 
     void execute(TgBot::Bot& bot, TgBot::Message::Ptr msg) override {
-        Log("[" + std::to_string(msg->from->id) + "] Create promo step-1 command");
         auto view = PromoEndDate(msg->from->id);
         bot::helper::SendMessage(bot, msg, view, "HTML");
     }
@@ -50,7 +52,6 @@ public:
     }
 
     void execute(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query) override {
-        Log("[" + std::to_string(query->from->id) + "] Create promo step-1 callback");
         auto view = PromoEndDate(query->from->id);
         bot::helper::EditMessage(bot, query, view, "HTML");
     }
@@ -59,6 +60,9 @@ public:
 
 MessageView PromoBonus(int64_t user_id)
 {
+    Log("[bot] [promo] [" + std::to_string(user_id) + 
+        "] select the key validity period after activation"); 
+
     service::users::SetState(user_id, UserState::Idle);
     
     std::ostringstream text;
@@ -88,7 +92,6 @@ public:
 
     void execute(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query) override {
         if (!query || !query->from || !query->message) return;
-        Log("[" + std::to_string(query->from->id) + "] Create promo step-2 callback");
         std::string data = query->data; 
         if (data.find(":") != std::string::npos)
         {
@@ -103,6 +106,8 @@ public:
 
 MessageView PromoPromo(int64_t user_id)
 {
+    Log("[bot] [promo] [" + std::to_string(user_id) + 
+        "] enter the number of times the promo code can be used");
     service::users::SetState(user_id, UserState::CreatePromoAviableUses);
     
     std::ostringstream text;
@@ -128,7 +133,6 @@ public:
 
     void execute(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query) override {
         if (!query || !query->from || !query->message) return;
-        Log("[" + std::to_string(query->from->id) + "] Create promo step-3 callback");
         std::string data = query->data; 
         if (data.find(":") != std::string::npos)
         {
@@ -150,10 +154,14 @@ MessageView ConfirmCreatePromo(int64_t user_id)
     
     if (service::promo::CreateByDraft(user_id))
     {
+        Log("[bot] [promo] [" + std::to_string(user_id) + 
+            "] promo code creation completed");
         text << "Промокод успешно создан!";
     }
     else 
     {
+        Log("[bot] [promo] [" + std::to_string(user_id) + 
+            " failed to create promo code");
         text << "Что-то пошло не так";
     }
 
@@ -174,7 +182,6 @@ public:
 
     void execute(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query) override {
         if (!query || !query->from || !query->message) return;
-        Log("[" + std::to_string(query->from->id) + "] Confirm create promo callback");
         auto view = ConfirmCreatePromo(query->from->id);
         bot::helper::EditMessage(bot, query, view);
     }
