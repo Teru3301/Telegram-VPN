@@ -1,16 +1,17 @@
 services:
   mongo:
-    network_mode: host
     image: mongo:7.0
+    network_mode: host
     container_name: mongodb
     volumes:
       - mongo_data:/data/db
+      - mongo_config:/data/configdb
     restart: unless-stopped
 
   bot:
-    network_mode: host
     build: .
-    container_name: telegram-vpn-bot
+    network_mode: host
+    container_name: vpn-bot
     depends_on:
       - mongo
     environment:
@@ -26,4 +27,7 @@ services:
 
 volumes:
   mongo_data:
+    name: mongo_data
+  mongo_config:
+    name: mongo_config
 
