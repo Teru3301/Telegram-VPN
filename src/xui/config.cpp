@@ -19,14 +19,14 @@ const models::XuiClient& GetXuiClient()
 
     if (!initialized)
     {
-        Log("[3x-ui] Init singleton");
+        Log("[3x-ui] [config] Init singleton");
 
         xui_client.base_url = ::config::GetEnv("XUI_URL");
         xui_client.timeout  = 5;
         xui_client.login    = ::config::GetEnv("XUI_LOGIN");
         xui_client.password = ::config::GetEnv("XUI_PASSWORD");
 
-        Log("[3x-ui] init URL=" + xui_client.base_url);
+        Log("[3x-ui] [config] init URL=" + xui_client.base_url);
         initialized = true;
     }
 
@@ -57,12 +57,12 @@ bool IsAlive()
 
     if (!res)
     {
-        Log("[3x-ui] unavailable: connection failed");
+        Log("[3x-ui] [config] unavailable: connection failed");
         return false;
     }
 
     Log(
-        "[3x-ui] OK, reachable, http code = " +
+        "[3x-ui] [config] OK, reachable, http code = " +
         std::to_string(res->status)
     );
 
@@ -87,14 +87,14 @@ bool Login()
 
     if (!res)
     {
-        Log("[3x-ui] login failed: no response");
+        Log("[3x-ui] [config] login failed: no response");
         return false;
     }
 
     if (res->status != 200 && res->status != 302)
     {
         Log(
-            "[3x-ui] login failed: http code = " +
+            "[3x-ui] [config] login failed: http code = " +
             std::to_string(res->status)
         );
         return false;
@@ -103,13 +103,13 @@ bool Login()
     auto set_cookie = res->get_header_value("Set-Cookie");
     if (set_cookie.empty())
     {
-        Log("[3x-ui] login failed: no Set-Cookie");
+        Log("[3x-ui] [config] login failed: no Set-Cookie");
         return false;
     }
 
     SetCookie(set_cookie);
 
-    Log("[3x-ui] login OK");
+    Log("[3x-ui] [config] login OK");
     return true;
 }
 
@@ -128,9 +128,9 @@ bool GetConnection()
     }
 
     if (connection_found)
-        Log("[3x-ui] [GetConnection] The connection was successfully found");
+        Log("[3x-ui] [config] [GetConnection] The connection was successfully found");
     else 
-        Log("[3x-ui] [GetConnection] Unable to find connection");
+        Log("[3x-ui] [config] [GetConnection] Unable to find connection");
 
     return connection_found;
 }

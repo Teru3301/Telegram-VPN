@@ -144,10 +144,12 @@ std::string BuildVlessKey(
 }
 
 
-models::Client GetClient(const std::string& email)
+models::Key GetClient(const std::string& email)
 {
-    models::Client result{};
-    result.enabled = false;
+    Log("[3x-ui] [GetClient] '" + email + "'");
+    
+    models::Key result{};
+    result.active = false;
 
     auto cfg = xui::config::GetXuiClient();
     httplib::Client cli = MakeClient(cfg);
@@ -161,7 +163,7 @@ models::Client GetClient(const std::string& email)
     auto res = cli.Get("/panel/api/inbounds/list", headers);
     if (!res || res->status != 200)
     {
-        Log("[3x-ui] GetClient: bad HTTP response");
+        Log("[3x-ui] [GetClient] '" + email + "' bad HTTP response");
         return result;
     }
 
@@ -170,37 +172,34 @@ models::Client GetClient(const std::string& email)
         auto j = nlohmann::json::parse(res->body);
 
         if (!j.contains("success") || !j["success"])
+        {
+            Log("[3x-ui] [GetClient] '" + email + "' does not contain success");
             return result;
+        }
 
         for (const auto& inbound : j["obj"])
         {
-            if (inbound["id"].get<int>() != cfg.inbound_id)
-                continue;
-
+            if (inbound["id"].get<int>() != cfg.inbound_id) continue;
             int port = inbound["port"].get<int>();
-
             auto stream = nlohmann::json::parse(
                 inbound["streamSettings"].get<std::string>()
             );
-
             auto reality = stream["realitySettings"];
-
-            std::string public_key = reality["publicKey"];
+            std::string public_key =
+            reality["settings"]["publicKey"].get<std::string>();
             std::string sni        = reality["serverNames"][0];
             std::string short_id   = reality["shortIds"][0];
-
             auto settings = nlohmann::json::parse(
                 inbound["settings"].get<std::string>()
             );
 
             for (const auto& client : settings["clients"])
             {
-                if (client["email"] != email)
-                    continue;
+                if (client["email"] != email) continue;
 
                 result.email       = email;
-                result.expiry_time = client["expiryTime"].get<int64_t>() / 1000;
-                result.enabled     = client["enable"];
+                result.end_date    = client["expiryTime"].get<int64_t>() / 1000;
+                result.active      = client["enable"];
 
                 result.vless_uri = BuildVlessKey(
                     client["id"],
@@ -218,7 +217,7 @@ models::Client GetClient(const std::string& email)
     }
     catch (const std::exception& e)
     {
-        Log(std::string("[3x-ui] GetClient parse error: ") + e.what());
+        Log(std::string("[3x-ui] [GetClient] '" + email + "' parse error: ") + e.what());
     }
 
     return result;

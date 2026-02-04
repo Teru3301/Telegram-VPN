@@ -9,10 +9,10 @@
 
 MessageView Profile(int64_t user_id)
 {
+    Log("[bot] [profile] [" + std::to_string(user_id) + "]");
     service::users::SetState(user_id, UserState::Idle);
-    
     std::vector<models::Key> keys = service::keys::GetAll(user_id);
-    
+
     std::ostringstream text;
     text
         << "👤 Ваш профиль\n\n"
@@ -28,7 +28,6 @@ MessageView Profile(int64_t user_id)
         << "🔑 Ключ: \n"
         << "<code>" << key.vless_uri << "</code>\n"
         << "⏳ Дата окончания: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "\n"
-        //<< (key.active ? "✅ активен" : "❌ не активен") << "\n"
         << "⬇️ Скачано: " << key.d_gb << "GB\n"
         << "⬆️ Отправлено: " << key.u_gb << "GB\n\n";
     }
@@ -52,7 +51,6 @@ public:
     }
 
     void execute(TgBot::Bot& bot, TgBot::Message::Ptr msg) override {
-        Log("[" + std::to_string(msg->from->id) + "] Profile command");
         auto view = Profile(msg->from->id);
         bot::helper::SendMessage(bot, msg, view, "HTML");
     }
@@ -66,7 +64,6 @@ public:
     }
 
     void execute(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query) override {
-        Log("[" + std::to_string(query->from->id) + "] Profile callback");
         auto view = Profile(query->from->id);
         bot::helper::EditMessage(bot, query, view, "HTML");
     }

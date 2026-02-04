@@ -7,6 +7,8 @@
 
 MessageView Start(int64_t user_id, const std::string& user_tag)
 {
+    Log("[bot] [start] [" + std::to_string(user_id) + "] @" + user_tag);
+
     service::users::SetState(user_id, UserState::Idle);
     
     std::ostringstream text;
@@ -51,7 +53,6 @@ public:
     }
 
     void execute(TgBot::Bot& bot, TgBot::Message::Ptr msg) override {
-        Log("[bot] [command] [start] [" + std::to_string(msg->from->id));
         bool reg_ok = service::users::RegisterNew(msg->from->id, msg->from->username);
         auto view = Start(msg->from->id, msg->from->username);
         bot::helper::SendMessage(bot, msg, view);
@@ -66,7 +67,6 @@ public:
     }
 
     void execute(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query) override {
-        Log("[bot] [callback] [start] [" + std::to_string(query->from->id));
         auto view = Start(query->from->id, query->from->username);
         bot::helper::EditMessage(bot, query, view, "HTML");
         bool reg_ok = service::users::RegisterNew(query->from->id, query->from->username);

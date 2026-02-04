@@ -13,21 +13,24 @@ namespace xui::keys
 
 
 //  Создаёт ключ для подключения
-models::Client CreateKey(int64_t expiry_time, int64_t tg_uid)
+models::Key CreateKey(int64_t expiry_time, int64_t tg_uid)
 {
-    models::Client vless_client = xui::utils::GetClient("");
-    
+    Log("[3x-ui] [CreateKey] [" + std::to_string(tg_uid) + "]");
+    models::Key key;
+
     if (!xui::config::GetConnection())
     {
-        Log("[3x-ui] no connection");
-        return vless_client;
+        Log("[3x-ui] [CreateKey] [" + std::to_string(tg_uid) + 
+            "] no connection");
+        return key;
     }
 
     auto cfg = xui::config::GetXuiClient();
     if (cfg.inbound_id <= 0)
     {
-        Log("[3x-ui] bad inbound id");
-        return vless_client;
+        Log("[3x-ui] [CreateKey] [" + std::to_string(tg_uid) + 
+            "] bad inbound id");
+        return key;
     }
 
     auto now = std::chrono::system_clock::now();
@@ -66,28 +69,36 @@ models::Client CreateKey(int64_t expiry_time, int64_t tg_uid)
 
     if (!res || res->status != 200)
     {
-        Log("[3x-ui] bad res status");
-        return vless_client;
+        Log("[3x-ui] [CreateKey] [" + std::to_string(tg_uid) + 
+            "] bad res status");
+        return key;
     }
 
-    //auto j = nlohmann::json::parse(res->body);
     nlohmann::json j;
-    try {
+    try 
+    {
         j = nlohmann::json::parse(res->body);
     } catch (const std::exception& e) {
-        Log(std::string("[3x-ui] json parse error: ") + e.what());
-        Log("[3x-ui] raw body: '" + res->body + "'");
+        Log("[3x-ui] [CreateKey] [" + std::to_string(tg_uid) + 
+            "] " + e.what());
+        Log("[3x-ui] [CreateKey] [" + std::to_string(tg_uid) + 
+            "] raw body: '" + res->body + "'");
         return {};
     }
 
     if (!j.contains("success") || !j["success"])
     {
-        Log("[3x-ui] add client failed");
-        Log("[3x-ui] json:\n" + j.dump());
+        Log("[3x-ui] [CreateKey] [" + std::to_string(tg_uid) + 
+            "] add client failed");
+        Log("[3x-ui] [CreateKey] [" + std::to_string(tg_uid) + 
+            "] json:\n" + j.dump());
         return {};
     }
     else if (j["success"] == true)
-        Log("[3x-ui] add client success");
+    {
+        Log("[3x-ui] [CreateKey] [" + std::to_string(tg_uid) + 
+            "] add client success");
+    }
 
     return utils::GetClient(email.str());
 }
@@ -110,6 +121,7 @@ bool EnableKey()
 //  Возвращает vless ключ и данные о нём по email
 models::Key GetVlessKey(const std::string& email)
 {
+    Log("[3x-ui] [GetVlessKey] client '" + email + "'");
     models::Key key{};
     key.email = email;
 
@@ -142,8 +154,6 @@ models::Key GetVlessKey(const std::string& email)
         return key;
     }
 
-    //auto j = nlohmann::json::parse(res->body);
-
     nlohmann::json j;
     try {
         j = nlohmann::json::parse(res->body);
@@ -152,7 +162,6 @@ models::Key GetVlessKey(const std::string& email)
         Log("[3x-ui] raw body: '" + res->body + "'");
         return {};
     }
-
 
 
     if (!j.contains("success") || !j["success"])
@@ -182,7 +191,7 @@ models::Key GetVlessKey(const std::string& email)
 
         auto reality = stream["realitySettings"];
 
-        std::string public_key = reality["publicKey"];
+        std::string public_key = reality["settings"]["publicKey"].get<std::string>();
         std::string short_id   = reality["shortIds"][0];
         std::string sni        = reality["serverNames"][0];
 
@@ -203,13 +212,10 @@ models::Key GetVlessKey(const std::string& email)
         return key;
     }
 
-    Log("[3x-ui] client not found: " + email);
+    Log("[3x-ui] client not found: '" + email + "'");
     return key;
 }
 
 
-
 }
-
-
 

@@ -27,7 +27,7 @@ std::string BuildVlessKey(
     const std::string& email
 );
 
-models::Client GetClient(const std::string& email);
+models::Key GetClient(const std::string& email);
 
 bool TryFindConnection();
 bool CreateConnection(const models::RealityCert& cert);

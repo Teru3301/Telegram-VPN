@@ -6,14 +6,15 @@
 
 MessageView Promo (int64_t user_id)
 {
+    Log("[bot] [Promo] [" + std::to_string(user_id) + "]");
+
     service::users::SetState(user_id, UserState::WaitPromo);
-    
+
     std::ostringstream text;
-    text
-        << "🎁 Введите промокод:";
+
+    text << "🎁 Введите промокод:";
 
     TgBot::InlineKeyboardMarkup::Ptr keyboard(new TgBot::InlineKeyboardMarkup);
-
     keyboard->inlineKeyboard.push_back({MakeButton("🔙 Отмена", "buy_vpn")});
 
     return {
@@ -30,7 +31,6 @@ public:
     }
 
     void execute(TgBot::Bot& bot, TgBot::Message::Ptr msg) override {
-        Log("[" + std::to_string(msg->from->id) + "] Promo command");
         auto view = Promo(msg->from->id);
         bot::helper::SendMessage(bot, msg, view, "HTML");
     }
@@ -44,7 +44,6 @@ public:
     }
 
     void execute(TgBot::Bot& bot, TgBot::CallbackQuery::Ptr query) override {
-        Log("[" + std::to_string(query->from->id) + "] Promo callback");
         auto view = Promo(query->from->id);
         bot::helper::EditMessage(bot, query, view, "HTML");
     }
