@@ -1,16 +1,23 @@
 services:
   mongo:
     image: mongo:7.0
-    network_mode: host
     container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_DB: tg-vpn-db
+      MONGO_USER: ${MONGO_USERNAME}
+      MONGO_PASS: ${MONGO_PASSWORD}
     volumes:
       - mongo_data:/data/db
       - mongo_config:/data/configdb
+      - ./mongo-init.js.tpl:/docker-entrypoint-initdb.d/mongo-init.js.tpl:ro
+    entrypoint: ["/bin/sh", "-c", "envsubst < /docker-entrypoint-initdb.d/mongo-init.js.tpl > /docker-entrypoint-initdb.d/mongo-init.js && exec docker-entrypoint.sh mongod"]
     restart: unless-stopped
 
   bot:
     image: ghcr.io/teru3301/telegram-vpn:latest
-    network_mode: host
+    #network_mode: host
     container_name: vpn-bot
     depends_on:
       - mongo
