@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <mongocxx/client.hpp>
@@ -15,10 +14,10 @@ class Database {
 public:
     Database() = default;
 
-    static void init(const std::string& uri, const std::string& dbname)
+    static void init(const std::string& uri)
     {
         if (!instance_ptr_)
-            instance_ptr_ = new Database(uri, dbname);
+            instance_ptr_ = new Database(uri);
     }
 
     static Database& instance()
@@ -29,12 +28,21 @@ public:
     }
 
     mongocxx::database& getDB() { return db_; }
+    
+    // Явное преобразование std::string_view в std::string
+    std::string getDatabaseName() { return std::string(db_.name()); }
 
 private:
-    Database(const std::string& uri, const std::string& dbname)
-        : client_(mongocxx::uri{uri}),
-          db_(client_[dbname])
-    {}
+    Database(const std::string& uri)
+        : client_(mongocxx::uri{uri})
+    {
+        // Получаем имя БД из URI
+        std::string dbname = mongocxx::uri{uri}.database();
+        if (dbname.empty()) {
+            throw std::runtime_error("Database name not specified in URI");
+        }
+        db_ = client_[dbname];
+    }
 
     mongocxx::client client_;
     mongocxx::database db_;

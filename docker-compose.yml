@@ -11,8 +11,7 @@ services:
     volumes:
       - mongo_data:/data/db
       - mongo_config:/data/configdb
-      - ./mongo-init.js.tpl:/docker-entrypoint-initdb.d/mongo-init.js.tpl:ro
-    entrypoint: ["/bin/sh", "-c", "envsubst < /docker-entrypoint-initdb.d/mongo-init.js.tpl > /docker-entrypoint-initdb.d/mongo-init.js && exec docker-entrypoint.sh mongod"]
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     restart: unless-stopped
 
   bot:

@@ -21,7 +21,7 @@ int main()
     config::CheckEnv("XUI_LOGIN");
     config::CheckEnv("XUI_PASSWORD");
 
-    Database::init(config::GetEnv("MONGO_URI"), "test_db");
+    Database::init(config::GetEnv("MONGO_URI"));
 
     if (!xui::config::GetConnection()) return 1;
     TgBot::Bot bot{config::GetEnv("TG_BOT_TOKEN")};
