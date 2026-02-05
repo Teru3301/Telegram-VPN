@@ -1,9 +1,7 @@
 #!/bin/bash
 
 ENV_FILE=".env"
-MONGO_INIT_FILE="mongo-init.js"
-
-echo "=== Telegram-VPN Setup Script ==="
+MONGO_INIT_FILE="vpn-bot/mongo/mongo-init.js"
 
 # --- timezone ---
 echo "Setting timezone to Europe/Moscow..."
@@ -45,6 +43,8 @@ EOL
 echo ".env file created."
 
 # --- mongo init ---
+mkdir -p vpn-bot/mongo
+mkdir -p vpn-bot/bot
 cat > "$MONGO_INIT_FILE" <<EOL
 db = db.getSiblingDB('$MONGO_DB');
 db.createUser({

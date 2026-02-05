@@ -2,7 +2,7 @@
 
 Безопасный VPN-сервис с доступом через Telegram-бота.
 
-<img src="https://img.shields.io/badge/bash-4EAA25?style=for-the-badge&logo=gnubash&logoColor=ffffff"/> <img src="https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=cplusplus&logoColor=ffffff"/> <img src="https://img.shields.io/badge/cmake-064F8C?style=for-the-badge&logo=cmake&logoColor=ffffff"/> <img src="https://img.shields.io/badge/mongodb-47A248?style=for-the-badge&logo=mongodb&logoColor=ffffff"/> <img src="https://img.shields.io/badge/telegram-26A5E4?style=for-the-badge&logo=Telegram&logoColor=ffffff"/> <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=ffffff"/> <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=ffffff"/>
+<img src="https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=cplusplus&logoColor=ffffff"/> <img src="https://img.shields.io/badge/cmake-064F8C?style=for-the-badge&logo=cmake&logoColor=ffffff"/> <img src="https://img.shields.io/badge/mongodb-47A248?style=for-the-badge&logo=mongodb&logoColor=ffffff"/> <img src="https://img.shields.io/badge/bash-4EAA25?style=for-the-badge&logo=gnubash&logoColor=ffffff"/> <img src="https://img.shields.io/badge/telegram-26A5E4?style=for-the-badge&logo=Telegram&logoColor=ffffff"/> <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=ffffff"/> <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=ffffff"/>
 
 ---
 
@@ -22,39 +22,47 @@
 ## Требования
 
 - Сервер с **Ubuntu 24.04 LTS**
-- Локальная машина на Linux с ssh и доступом в интернет
 - **Telegram Bot Token** (получить у [@BotFather](https://t.me/botfather))
 
 ---
 
 ## Установка
 
-Выполните следующие команды на локальной машине
+Выполните следующие команды на удалённом сервере
 ```bash
-git clone https://github.com/Teru3301/Telegram-VPN.git
-cd Telegram-VPN
-chmod +x SetUp.sh
-./SetUp.sh
+curl -fsSL https://raw.githubusercontent.com/Teru3301/Telegram-VPN/main/install.sh -o install.sh
+chmod +x install.sh
+./install.sh
 ```
-
-**В процессе установки потребуется ввести:**
-- IP-адрес удалённого сервера
-- Имя нового Linux-пользователя
-- Кастомный SSH-порт
-- Токен Telegram-бота
-
-> **Важно:** Скрипт предназначен для однократной настройки **чистого** сервера.
 
 ---
 
-## Использование
+## Переменные окружения
 
-После установки всех компонентов, скрипт сгенерирует:
-- **SSH-команду** для подключения к серверу
-- **Ссылку** для быстрого доступа к 3x-ui панели
+`TZ` - часовой пояс сервера (по умолчанию Europe/Moscow)
+
+`TG_BOT_TOKEN` - токен вашего Telegram-бота
+
+`MONGO_USERNAME` - имя пользователя для подключения к MongoDB (по умолчанию vpnbot)
+
+`MONGO_PASSWORD` - пароль пользователя MongoDB (по умолчанию botpass)
+
+`MONGO_DB` - название базы данных для бота (по умолчанию tg-vpn-db)
+
+`MONGO_URI` - строка подключения к MongoDB (формируется автоматически)
+
+`IP` - IP-адрес вашего сервера (по умолчанию 127.0.0.1)
+
+`XUI_URL` - адрес веб-панели 3X-UI (по умолчанию 172.17.0.1:2053)
+
+`XUI_LOGIN` - логин для входа в панель 3X-UI (по умолчанию admin)
+
+`XUI_PASSWORD` - пароль для входа в панель 3X-UI (по умолчанию admin)
+
+---
 
 Для добавления администратора Telegram-бота:
-1. Отредактируйте файл `data/admins.json`
+1. Отредактируйте файл `vpn-bot/bot/admins.json`
 2. Укажите правило определиения является ли пользователь администратором: 
 - `or` - у пользователя совпадает username или id с указанными в admins.json (полезно если неизвестен один из параметров) 
 - `and` - у пользователя совпадают все параметры
@@ -65,22 +73,6 @@ docker compose restart bot
 ```
 
 На данный момент администратор может только создавать новые промокоды.
-
----
-
-## Переменные окружения
-
-`TG_BOT_TOKEN` — токен Telegram-бота
-
-`MONGO_URI` — строка подключения к MongoDB
-
-`XUI_URL` - адрес 3X-UI панели
-
-`IP` - ip-адрес вашего сервера
-
-`XUI_LOGIN` - логин для входа в веб панель 3x-ui
-
-`XUI_PASSWORD` - пароль для входа в веб панель 3x-ui
 
 ---
 
@@ -99,7 +91,7 @@ docker compose restart bot
 ## TODO
 
 ### Core
-- [ ] Реализация Telegram-бота
+- [x] Реализация Telegram-бота
 - [x] Интеграция с 3x-ui API
 - [x] Создание docker образа
 
@@ -109,11 +101,11 @@ docker compose restart bot
 
 ### Others
 - [ ] Мануалы по использованию бота на разных платформах
-- [ ] Отдельные скрипты для установики контейнетов и настройки сервера
+- [ ] Отдельны скрипт для настройки сервера
+- [x] Отдельны скрипт для установики контейнетов 
 
 ---
 
 > [!WARNING]
 > Проект в активной разработке. API и функционал могут изменяться.
-
 
