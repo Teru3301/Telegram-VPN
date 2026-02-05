@@ -1,5 +1,7 @@
 #!/bin/bash
 
+curl -fsSL https://raw.githubusercontent.com/Teru3301/Telegram-VPN/main/docker-compose.yml -o docker-compose.yml
+
 ENV_FILE=".env"
 MONGO_INIT_FILE="vpn-bot/mongo/mongo-init.js"
 
