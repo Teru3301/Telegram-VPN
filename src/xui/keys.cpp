@@ -118,12 +118,15 @@ bool EnableKey()
 }
 
 
-//  Возвращает vless ключ и данные о нём по email
+
+// Возвращает vless ключ и данные о нём по email
 models::Key GetVlessKey(const std::string& email)
 {
     Log("[3x-ui] [GetVlessKey] client '" + email + "'");
+
     models::Key key{};
     key.email = email;
+    key.active = false;
 
     if (!xui::config::GetConnection())
     {
@@ -140,76 +143,107 @@ models::Key GetVlessKey(const std::string& email)
 
     httplib::Client cli = utils::MakeClient(cfg);
     httplib::Headers headers = {
-        {"Cookie", cfg.cookie}
+        { "Cookie", cfg.cookie },
+        { "Content-Type", "application/json" }
     };
 
-    auto res = cli.Get(
-        ("/panel/api/inbounds/get/" + std::to_string(cfg.inbound_id)).c_str(),
-        headers
-    );
-
+    auto res = cli.Get("/panel/api/inbounds/list", headers);
     if (!res || res->status != 200)
     {
-        Log("[3x-ui] failed to get inbound");
+        Log("[3x-ui] failed to get inbounds list");
         return key;
     }
 
     nlohmann::json j;
-    try {
-        j = nlohmann::json::parse(res->body);
-    } catch (const std::exception& e) {
-        Log(std::string("[3x-ui] json parse error: ") + e.what());
-        Log("[3x-ui] raw body: '" + res->body + "'");
-        return {};
-    }
-
-
-    if (!j.contains("success") || !j["success"])
+    try
     {
-        Log("[3x-ui] inbound request failed");
+        j = nlohmann::json::parse(res->body);
+    }
+    catch (const std::exception& e)
+    {
+        Log(std::string("[3x-ui] json parse error: ") + e.what());
         return key;
     }
 
-    auto inbound = j["obj"];
-    auto settings = nlohmann::json::parse(inbound["settings"].get<std::string>());
-    auto clients = settings["clients"];
-
-    for (auto& c : clients)
+    if (!j.value("success", false) || !j.contains("obj"))
     {
-        if (c["email"] != email)
+        Log("[3x-ui] bad response structure");
+        return key;
+    }
+
+    for (const auto& inbound : j["obj"])
+    {
+        if (inbound.value("id", -1) != cfg.inbound_id)
             continue;
 
-        key.active   = c.value("enable", false);
-        key.end_date = c.value("expiryTime", 0ULL);
-        key.u_gb     = c.value("up", 0ULL)   / 1024.0 / 1024.0 / 1024.0;
-        key.d_gb     = c.value("down", 0ULL) / 1024.0 / 1024.0 / 1024.0;
+        key.u = 0;
+        key.d = 0;
 
-        // Reality stream settings
-        auto stream = nlohmann::json::parse(
-            inbound["streamSettings"].get<std::string>()
+        if (inbound.contains("clientStats") && inbound["clientStats"].is_array())
+        {
+            for (const auto& st : inbound["clientStats"])
+            {
+                if (st.value("email", "") == email)
+                {
+                    key.u = st.value("up", 0ULL);
+                    key.d = st.value("down", 0ULL);
+                    break;
+                }
+            }
+        }
+
+        auto settings = nlohmann::json::parse(
+            inbound["settings"].get<std::string>()
         );
 
-        auto reality = stream["realitySettings"];
+        if (!settings.contains("clients") || !settings["clients"].is_array())
+            continue;
 
-        std::string public_key = reality["settings"]["publicKey"].get<std::string>();
-        std::string short_id   = reality["shortIds"][0];
-        std::string sni        = reality["serverNames"][0];
+        for (const auto& c : settings["clients"])
+        {
+            if (c.value("email", "") != email)
+                continue;
 
-        std::string host = ::config::GetEnv("IP");
-        int port = inbound["port"];
+            key.active   = c.value("enable", false);
+            key.end_date = c.value("expiryTime", 0ULL) / 1000;
 
-        key.vless_uri = utils::BuildVlessKey(
-            c["id"],
-            host,
-            port,
-            public_key,
-            short_id,
-            sni,
-            email
-        );
-        key.end_date /= 1000;
+            auto stream = nlohmann::json::parse(
+                inbound["streamSettings"].get<std::string>()
+            );
 
-        return key;
+            auto reality = stream["realitySettings"];
+
+            std::string public_key =
+                reality["settings"]["publicKey"].get<std::string>();
+
+            std::string short_id =
+                reality["shortIds"].at(0).get<std::string>();
+
+            std::string sni =
+                reality["serverNames"].at(0).get<std::string>();
+
+            std::string host = ::config::GetEnv("IP");
+            int port = inbound["port"].get<int>();
+
+            key.vless_uri = utils::BuildVlessKey(
+                c["id"].get<std::string>(),
+                host,
+                port,
+                public_key,
+                short_id,
+                sni,
+                email
+            );
+
+            Log(
+                "[3x-ui] [GetVlessKey] '" + email +
+                "' up=" + std::to_string(key.u) +
+                "GB down=" + std::to_string(key.d) +
+                "GB exp=" + std::to_string(key.end_date)
+            );
+
+            return key;
+        }
     }
 
     Log("[3x-ui] client not found: '" + email + "'");

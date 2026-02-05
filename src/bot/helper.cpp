@@ -58,5 +58,27 @@ void EditMessage(
 }
 
 
+std::string BytesToHumanReadable(uint64_t bytes)
+{
+    constexpr double KB = 1024.0;
+    constexpr double MB = KB * 1024.0;
+    constexpr double GB = MB * 1024.0;
+
+    std::ostringstream oss;
+    oss << std::fixed << std::setprecision(2);
+
+    if (bytes < KB)
+        return std::to_string(bytes) + " B";
+    if (bytes < MB)
+        oss << bytes / KB << " KB";
+    else if (bytes < GB)
+        oss << bytes / MB << " MB";
+    else
+        oss << bytes / GB << " GB";
+
+    return oss.str();
+}
+
+
 }
 

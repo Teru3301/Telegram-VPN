@@ -28,8 +28,8 @@ MessageView Profile(int64_t user_id)
         << "🔑 Ключ: \n"
         << "<code>" << key.vless_uri << "</code>\n"
         << "⏳ Дата окончания: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "\n"
-        << "⬇️ Скачано: " << key.d_gb << "GB\n"
-        << "⬆️ Отправлено: " << key.u_gb << "GB\n\n";
+        << "⬇️ Скачано: " << bot::helper::BytesToHumanReadable(key.d) << "\n"
+        << "⬆️ Отправлено: " << bot::helper::BytesToHumanReadable(key.u) << "\n\n";
     }
 
     TgBot::InlineKeyboardMarkup::Ptr keyboard(new TgBot::InlineKeyboardMarkup);

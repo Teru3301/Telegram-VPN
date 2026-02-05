@@ -21,6 +21,7 @@ void EditMessage(
         const MessageView& view, 
         const std::string& parse_mode = ""
         );
+std::string BytesToHumanReadable(uint64_t bytes);
 
 
 }
