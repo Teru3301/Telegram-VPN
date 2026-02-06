@@ -24,13 +24,53 @@
 - Сервер с **Ubuntu 24.04 LTS**
 - **Telegram Bot Token** (получить у [@BotFather](https://t.me/botfather))
 
+На сервере должны быть:
+- Установлены docker и git
+- Создан отдельный пользователь (не root)
+- Пользователь добавлен в группу docker
+
+### Для автоматической и безопасной настройки сервера используйте скрипт, который запускается на локальной машине.
+
+Windows:
+```bash
+TODO
+```
+
+Linux:
+```bash
+curl -fsSL https://raw.githubusercontent.com/Teru3301/Telegram-VPN/main/scripts/linux.sh -o linux.sh
+chmod +x linux.sh
+./linux.sh
+```
+
+### Что делает скрипт
+
+- Обновляет систему
+- Создаёт нового пользователя и настраивает sudo
+- Настраивает SSH:
+    - Вход только по ключу
+    - Доступ по SSH для root отключается
+    - Вход по паролю запрещён
+    - Используется кастомный SSH-порт
+- Устанавливает базовые утилиты
+- Устанавливает Docker и добавляет пользователя в группу docker
+
+
+> [!WARNING]
+> **Важно:** После выполнения скрипта вход по SSH под root будет недоступен
+
+После выполнения вы получите SSH-команду для подключения к серверу по ключу:
+```
+ssh -p <PORT> <USER>@<SERVER_IP>
+```
+
 ---
 
 ## Установка
 
 Выполните следующие команды на удалённом сервере
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Teru3301/Telegram-VPN/main/install.sh -o install.sh
+curl -fsSL https://raw.githubusercontent.com/Teru3301/Telegram-VPN/main/scripts/install.sh -o install.sh
 chmod +x install.sh
 ./install.sh
 ```
@@ -101,7 +141,8 @@ docker compose restart bot
 
 ### Others
 - [ ] Мануалы по использованию бота на разных платформах
-- [ ] Отдельны скрипт для настройки сервера
+- [x] Вспомогательный скрипт (Linux)
+- [ ] Вспомогательный скрипт (Windows)
 - [x] Отдельны скрипт для установики контейнетов 
 
 ---

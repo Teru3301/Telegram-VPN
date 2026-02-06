@@ -110,64 +110,18 @@ ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$SERVER_IP 
     echo ''
     echo '------------------------------------------------'
     echo ''
-    echo 'Installing 3x-ui...'
-    echo ''
-    echo 'Create docker-compose file...'
-    mkdir -p /opt/3xui/
-    cat > /opt/3xui/docker-compose.yml << 'EOF'
-services:
-  3x-ui:
-    image: metaligh/3x-ui:latest
-    container_name: 3x-ui
-    hostname: 3x-ui-panel
-    volumes:
-      - ./db/:/etc/x-ui/
-      - /etc/letsencrypt/:/etc/letsencrypt/:rw
-    environment:
-      XRAY_VMESS_AEAD_FORCED: \"false\"
-    tty: true
-    network_mode: host
-    restart: unless-stopped
-EOF
-    echo 'Deploy 3x-ui...'
-    cd /opt/3xui &&
-    docker compose up -d &&
-    sleep 3 &&
-    docker ps | grep 3x-ui
-    echo ''
-    echo '3x-ui deployed successfully!'
 "
 
 
 if [ $? -eq 0 ]; then
+    echo 'Setup complete!'
     echo ''
     echo '------------------------------------------------'
     echo ''
-    echo 'Setup complete!'
-    echo ''
-    echo '**IMPORTANT**: For docker permissions to take effect,'
-    echo 'you need to either:'
-    echo '1. Re-login to the server:'
-    echo "   ssh -p $CUSTOM_PORT $NEW_USER_NAME@$SERVER_IP"
-    echo '2. Or run this command on the server:'
-    echo "   sudo newgrp docker"
+    echo 'Connect to server:'
+    echo "ssh -p $CUSTOM_PORT $NEW_USER_NAME@$SERVER_IP"
 else
     echo 'Connection error!'
     exit 1
 fi
-
-
-echo ''
-echo '------------------------------------------------'
-echo ''
-echo 'Connect to server:'
-echo "ssh -p $CUSTOM_PORT $NEW_USER_NAME@$SERVER_IP"
-echo ''
-echo '3x-ui panel:'
-echo "http://$SERVER_IP:2053"
-echo ''
-echo 'Docker commands (after re-login or newgrp):'
-echo "ssh -p $CUSTOM_PORT $NEW_USER_NAME@$SERVER_IP 'docker ps'"
-echo "ssh -p $CUSTOM_PORT $NEW_USER_NAME@$SERVER_IP 'docker logs 3x-ui'"
-echo ''
 
