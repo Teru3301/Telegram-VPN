@@ -48,6 +48,27 @@ echo "NEW_ADDR = $NEW_ADDR"
 
 COOKIE="/tmp/3xui_cookie.txt"
 
+
+# --- Ожидание запуска 3x-ui контейнера ---
+echo "[*] Waiting for 3x-ui container to be ready..."
+
+MAX_RETRIES=30   # максимум попыток
+SLEEP_TIME=2     # пауза между попытками в секундах
+RETRY=0
+
+while ! curl -s --connect-timeout 1 "$OLD_ADDR" >/dev/null 2>&1; do
+    RETRY=$((RETRY+1))
+    if [ "$RETRY" -ge "$MAX_RETRIES" ]; then
+        echo "[!] Timeout waiting for 3x-ui container"
+        exit 1
+    fi
+    echo "[*] 3x-ui not ready yet, retrying in $SLEEP_TIME seconds..."
+    sleep $SLEEP_TIME
+done
+
+echo "[✓] 3x-ui is responding!"
+
+
 # --- Login на старый адрес ---
 echo "[*] Login to OLD_ADDR..."
 RESP=$(curl -s -c "$COOKIE" \
