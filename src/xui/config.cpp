@@ -21,12 +21,53 @@ const models::XuiClient& GetXuiClient()
     {
         Log("[3x-ui] [config] Init singleton");
 
-        xui_client.base_url = ::config::GetEnv("XUI_URL");
+        std::string url = ::config::GetEnv("XUI_URL");
+
+        // ---- defaults ----
+        xui_client.path = "/";
         xui_client.timeout  = 5;
         xui_client.login    = ::config::GetEnv("XUI_LOGIN");
         xui_client.password = ::config::GetEnv("XUI_PASSWORD");
 
-        Log("[3x-ui] [config] init URL=" + xui_client.base_url);
+        // ---- scheme ----
+        std::string scheme = "http://";
+        if (url.rfind("http://", 0) == 0) {
+            url.erase(0, 7);
+        } else if (url.rfind("https://", 0) == 0) {
+            scheme = "https://";
+            url.erase(0, 8);
+        }
+
+        // ---- split path ----
+        auto slash_pos = url.find('/');
+        if (slash_pos != std::string::npos) {
+            xui_client.path = url.substr(slash_pos);
+            url = url.substr(0, slash_pos);
+        }
+
+        // ---- split host:port ----
+        auto colon_pos = url.find(':');
+        if (colon_pos != std::string::npos) {
+            xui_client.host = url.substr(0, colon_pos);
+            xui_client.port = url.substr(colon_pos + 1);
+        } else {
+            xui_client.host = url;
+            xui_client.port = "80";
+        }
+
+        // ---- normalize path ----
+        if (xui_client.path.empty() || xui_client.path[0] != '/') {
+            xui_client.path = "/" + xui_client.path;
+        }
+        if (xui_client.path.size() > 1 && xui_client.path.back() == '/') {
+            xui_client.path.pop_back();
+        }
+
+        // ---- base_url WITHOUT path ----
+        std::string base_url = scheme + xui_client.host + ":" + xui_client.port + xui_client.path;
+
+        Log("[3x-ui] [config] base_url = " + base_url);
+
         initialized = true;
     }
 
@@ -53,7 +94,7 @@ bool IsAlive()
     auto cfg = GetXuiClient();
     auto cli = xui::utils::MakeClient(cfg);
 
-    auto res = cli.Head("/");
+    auto res = cli.Head(cfg.path + "/");
 
     if (!res)
     {
@@ -80,7 +121,7 @@ bool Login()
         "&password=" + cfg.password;
 
     auto res = cli.Post(
-        "/login",
+        cfg.path + "/login",
         body,
         "application/x-www-form-urlencoded"
     );

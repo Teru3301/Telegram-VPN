@@ -23,7 +23,9 @@ struct Key
 
 struct XuiClient
 {
-    std::string base_url;
+    std::string path;
+    std::string host;
+    std::string port;
     std::string login;
     std::string password;
     std::string cookie;

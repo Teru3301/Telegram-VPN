@@ -1,14 +1,11 @@
 #!/bin/bash
 
 curl -fsSL https://raw.githubusercontent.com/Teru3301/Telegram-VPN/main/docker-compose.yml -o docker-compose.yml
+curl -fsSL https://raw.githubusercontent.com/Teru3301/Telegram-VPN/main/scripts/3x-setup.sh -o 3x-setup.sh
+chmod +x 3x-setup.sh
 
 ENV_FILE=".env"
 MONGO_INIT_FILE="vpn-bot/mongo/mongo-init.js"
-
-# --- timezone ---
-echo "Setting timezone to Europe/Moscow..."
-sudo ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
-echo "Europe/Moscow" | sudo tee /etc/timezone >/dev/null
 
 # --- function ---
 ask_var() {
@@ -24,9 +21,12 @@ MONGO_USERNAME=$(ask_var "MONGO_USERNAME" "vpnbot")
 MONGO_PASSWORD=$(ask_var "MONGO_PASSWORD" "botpass")
 MONGO_DB=$(ask_var "MONGO_DB" "tg-vpn-db")
 IP=$(ask_var "IP" "127.0.0.1")
-XUI_URL=$(ask_var "XUI_URL" "172.17.0.1:2053")
-XUI_LOGIN=$(ask_var "XUI_LOGIN" "admin")
-XUI_PASSWORD=$(ask_var "XUI_PASSWORD" "admin")
+XUI_PORT=$(ask_var "XUI_PORT" "2053")
+XUI_PATH=$(ask_var "XUI_PATH" "/3x")
+XUI_LOGIN=$(ask_var "XUI_LOGIN" "xui_admin")
+XUI_PASSWORD=$(ask_var "XUI_PASSWORD" "admin_password")
+XUI_URL="172.17.0.1:$XUI_PORT$XUI_PATH"
+XUI_URL="${XUI_URL%/}"
 
 # --- .env ---
 cat > "$ENV_FILE" <<EOL
@@ -62,5 +62,10 @@ echo "mongo-init.js file created."
 echo "Starting Docker containers..."
 docker compose up -d
 
+echo "Configure 3x-ui..."
+sleep 2
+./3x-setup.sh "172.17.0.1:2053" "admin" "admin" "$XUI_PORT" "$XUI_PATH" "$XUI_LOGIN" "$XUI_PASSWORD"
+
 echo "Setup complete!"
+echo "Add admins to \"./vpn-bot/bot/admin.json\" and restart bot container \"docker container restart vpn-bot\""
 

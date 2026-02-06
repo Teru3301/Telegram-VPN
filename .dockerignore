@@ -1,7 +1,7 @@
 .git
 build
-Bot/build
 .env
 *.o
 *.a
-
+scripts
+vpn-bot

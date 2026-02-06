@@ -60,7 +60,7 @@ models::RealityCert GenerateRealityCert()
     };
 
     auto res = cli.Post(
-        "/server/getNewX25519Cert",
+        cfg.path + "/server/getNewX25519Cert",
         headers,
         "",
         "application/json"
@@ -160,7 +160,7 @@ models::Key GetClient(const std::string& email)
         { "Content-Type", "application/json" }
     };
 
-    auto res = cli.Get("/panel/api/inbounds/list", headers);
+    auto res = cli.Get(cfg.path + "/panel/api/inbounds/list", headers);
     if (!res || res->status != 200)
     {
         Log("[3x-ui] [GetClient] '" + email + "' bad HTTP response");
@@ -234,7 +234,7 @@ bool TryFindConnection()
         { "Cookie", cfg.cookie }
     };
 
-    auto res = cli.Get("/panel/api/inbounds/list", headers);
+    auto res = cli.Get(cfg.path + "/panel/api/inbounds/list", headers);
     if (!res || res->status != 200)
     {
         Log("[3x-ui] [TryFindConnection] Error. http status is missing or not 200");
@@ -326,7 +326,7 @@ bool CreateConnection(const models::RealityCert& cert)
         {"enable", true}
     };
 
-    auto res = cli.Post("/panel/api/inbounds/add", headers, payload.dump(), "application/json");
+    auto res = cli.Post(cfg.path + "/panel/api/inbounds/add", headers, payload.dump(), "application/json");
 
     if (!res || res->status != 200)
     {
@@ -356,7 +356,7 @@ bool CreateConnection(const models::RealityCert& cert)
 
 httplib::Client MakeClient(const models::XuiClient& xui_client)
 {
-    httplib::Client cli(xui_client.base_url);
+    httplib::Client cli(xui_client.host + ":" + xui_client.port);
     cli.set_connection_timeout(xui_client.timeout);
     cli.set_read_timeout(xui_client.timeout);
     cli.set_write_timeout(xui_client.timeout);

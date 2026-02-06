@@ -61,7 +61,7 @@ models::Key CreateKey(int64_t expiry_time, int64_t tg_uid)
     };
 
     auto res = cli.Post(
-        "/panel/api/inbounds/addClient",
+        cfg.path + "/panel/api/inbounds/addClient",
         headers,
         payload.dump(),
         "application/json"
@@ -147,7 +147,7 @@ models::Key GetVlessKey(const std::string& email)
         { "Content-Type", "application/json" }
     };
 
-    auto res = cli.Get("/panel/api/inbounds/list", headers);
+    auto res = cli.Get(cfg.path + "/panel/api/inbounds/list", headers);
     if (!res || res->status != 200)
     {
         Log("[3x-ui] failed to get inbounds list");
@@ -238,8 +238,8 @@ models::Key GetVlessKey(const std::string& email)
             Log(
                 "[3x-ui] [GetVlessKey] '" + email +
                 "' up=" + std::to_string(key.u) +
-                "GB down=" + std::to_string(key.d) +
-                "GB exp=" + std::to_string(key.end_date)
+                "B down=" + std::to_string(key.d) +
+                "B exp=" + std::to_string(key.end_date)
             );
 
             return key;
