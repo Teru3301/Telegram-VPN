@@ -12,3 +12,14 @@ TgBot::InlineKeyboardButton::Ptr MakeButton(std::string text, std::string callba
     return button;
 }
 
+
+TgBot::InlineKeyboardButton::Ptr MakeUrlButton(std::string text, std::string url)
+{
+    TgBot::InlineKeyboardButton::Ptr button = std::make_shared<TgBot::InlineKeyboardButton>();
+
+    button->text = text;
+    button->url = url;
+
+    return button;
+}
+

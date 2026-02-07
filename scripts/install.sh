@@ -67,5 +67,5 @@ sleep 2
 ./3x-setup.sh "172.17.0.1:2053" "admin" "admin" "$XUI_PORT" "$XUI_PATH" "$XUI_LOGIN" "$XUI_PASSWORD"
 
 echo "Setup complete!"
-echo "Add admins to \"./vpn-bot/bot/admin.json\" and restart bot container \"docker container restart vpn-bot\""
+echo "Edit \"./vpn-bot/bot/config.json\" and restart bot container \"docker compose restart vpn-bot\""
 

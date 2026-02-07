@@ -27,7 +27,7 @@ services:
     tty: true
     restart: unless-stopped
 
-  bot:
+  vpn-bot:
     image: ghcr.io/teru3301/telegram-vpn:latest
     container_name: vpn-bot
     depends_on:

@@ -50,6 +50,33 @@ struct RealityCert
     std::vector<std::string> short_ids;
 };
 
+enum class Rule
+{
+    Or,
+    And
+};
+
+struct Admin
+{
+    std::string user_tag;
+    int64_t     user_id;
+};
+
+
+struct Tarif
+{
+    std::string title;
+    uint64_t price;
+    uint64_t time_in_ms;
+};
+
+
+struct Manual
+{
+    std::string title;
+    std::string link;
+};
+
 
 }
 

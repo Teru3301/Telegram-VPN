@@ -28,4 +28,5 @@ struct MessageView {
 
 
 TgBot::InlineKeyboardButton::Ptr MakeButton(std::string text, std::string callback);
+TgBot::InlineKeyboardButton::Ptr MakeUrlButton(std::string text, std::string url);
 

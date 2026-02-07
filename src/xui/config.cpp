@@ -59,7 +59,7 @@ const models::XuiClient& GetXuiClient()
         if (xui_client.path.empty() || xui_client.path[0] != '/') {
             xui_client.path = "/" + xui_client.path;
         }
-        if (xui_client.path.size() > 1 && xui_client.path.back() == '/') {
+        if (xui_client.path.back() == '/') {
             xui_client.path.pop_back();
         }
 

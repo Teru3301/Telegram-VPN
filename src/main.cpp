@@ -25,7 +25,7 @@ int main()
 
     if (!xui::config::GetConnection()) return 1;
     TgBot::Bot bot{config::GetEnv("TG_BOT_TOKEN")};
-    bot::config::LoadAdmins("data/admins.json");
+    if (!bot::config::LoadConfig("data/config.json")) return 1;
 
     CommandDispatcher cmd_dispatcher;
     CallbackDispatcher cal_dispatcher;

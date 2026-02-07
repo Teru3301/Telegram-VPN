@@ -2,6 +2,7 @@
 #include "bot/commands.hpp"
 #include "services/users.hpp"
 #include "bot/helper.hpp"
+#include "bot/config.hpp"
 
 
 MessageView HowToUse (int64_t user_id)
@@ -15,9 +16,10 @@ MessageView HowToUse (int64_t user_id)
 
     TgBot::InlineKeyboardMarkup::Ptr keyboard(new TgBot::InlineKeyboardMarkup);
 
-    keyboard->inlineKeyboard.push_back({MakeButton("🖥️ Windows", "how_to_windows")});
-    keyboard->inlineKeyboard.push_back({MakeButton("🐧 Linux", "how_to_linux")});
-    keyboard->inlineKeyboard.push_back({MakeButton("📱Android", "how_to_android")});
+
+    for (const auto& manual : bot::config::GetManuals())
+        keyboard->inlineKeyboard.push_back({MakeUrlButton(manual.title, manual.link)});
+
     keyboard->inlineKeyboard.push_back({MakeButton("🔙 Назад", "start")});
 
     return {
